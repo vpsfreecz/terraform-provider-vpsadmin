@@ -7,6 +7,7 @@ in stdenv.mkDerivation rec {
 
   buildInputs = with pkgs;[
     git
+    gnumake
     go
     gotools
     terraform
