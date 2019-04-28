@@ -1,7 +1,6 @@
 package vpsadmin
 
 import (
-	"errors"
 	"fmt"
 	"github.com/vpsfreecz/vpsadmin-go-client/client"
 )
@@ -15,12 +14,10 @@ func (c *Config) getClient() *client.Client {
 }
 
 func (c *Config) testAuthentication() error {
-	resp, err := c.client.User.Current.Call()
+	_, err := getCurrentUser(c.client)
 
 	if err != nil {
 		return err
-	} else if !resp.Status {
-		return errors.New(resp.Message)
 	}
 
 	return nil
