@@ -98,23 +98,20 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	create := api.Vps.Create.Prepare()
-	create.SetInput(&client.ActionVpsCreateInput{
-		Location: locationId,
-		OsTemplate: templateId,
-		Hostname: d.Get("hostname").(string),
-		Cpu: int64(d.Get("cpu").(int)),
-		Memory: int64(d.Get("memory").(int)),
-		Swap: int64(d.Get("swap").(int)),
-		Diskspace: int64(d.Get("diskspace").(int)),
-		Ipv4: int64(d.Get("public_ipv4_count").(int)),
-		Ipv4Private: int64(d.Get("private_ipv4_count").(int)),
-		Ipv6: int64(d.Get("public_ipv6_count").(int)),
-	})
-	create.Input.SelectParameters(
-		"Location", "OsTemplate", "Hostname",
-		"Cpu", "Memory", "Swap", "Diskspace",
-		"Ipv4", "Ipv4Private", "Ipv6",
-	)
+
+	input := &client.ActionVpsCreateInput{}
+	input.SetLocation(locationId)
+	input.SetOsTemplate(templateId)
+	input.SetHostname(d.Get("hostname").(string))
+	input.SetCpu(int64(d.Get("cpu").(int)))
+	input.SetMemory(int64(d.Get("memory").(int)))
+	input.SetSwap(int64(d.Get("swap").(int)))
+	input.SetDiskspace(int64(d.Get("diskspace").(int)))
+	input.SetIpv4(int64(d.Get("public_ipv4_count").(int)))
+	input.SetIpv4Private(int64(d.Get("private_ipv4_count").(int)))
+	input.SetIpv6(int64(d.Get("public_ipv6_count").(int)))
+
+	create.SetInput(input)
 
 	log.Printf("[DEBUG] VPS create configuration: %#v", create.Input)
 
