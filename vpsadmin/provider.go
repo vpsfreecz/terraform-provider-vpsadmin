@@ -23,6 +23,7 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"vpsadmin_ssh_key": resourceSshKey(),
 			"vpsadmin_vps": resourceVps(),
 		},
 		ConfigureFunc: providerConfigure,
