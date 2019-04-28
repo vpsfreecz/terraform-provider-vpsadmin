@@ -43,3 +43,13 @@ func getPrimaryHostIpAddress(api *client.Client, vpsId int64, ipVersion int, rol
 
 	return resp.Output[0].Addr
 }
+
+func getPrimaryConnectionAddress(publicIpv4, privateIpv4, publicIpv6 string) string {
+	if publicIpv4 != "" {
+		return publicIpv4
+	} else if publicIpv6 != "" {
+		return publicIpv6
+	} else {
+		return privateIpv4
+	}
+}

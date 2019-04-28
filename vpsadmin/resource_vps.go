@@ -197,6 +197,10 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	publicIpv4 := getPrimaryPublicHostIpv4Address(api, vps.Id)
+	privateIpv4 := getPrimaryPrivateHostIpv4Address(api, vps.Id)
+	publicIpv6 := getPrimaryPublicHostIpv6Address(api, vps.Id)
+
 	d.Set("location", vps.Node.Location.Label)
 	d.Set("node", vps.Node.DomainName)
 	d.Set("os_template", vps.OsTemplate.Name)
@@ -205,9 +209,19 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("memory", vps.Memory)
 	d.Set("swap", vps.Swap)
 	d.Set("diskspace", ds.Refquota)
-	d.Set("public_ipv4_address", getPrimaryPublicHostIpv4Address(api, vps.Id))
-	d.Set("private_ipv4_address", getPrimaryPrivateHostIpv4Address(api, vps.Id))
-	d.Set("public_ipv6_address", getPrimaryPublicHostIpv6Address(api, vps.Id))
+	d.Set("public_ipv4_address", publicIpv4)
+	d.Set("private_ipv4_address", privateIpv4)
+	d.Set("public_ipv6_address", publicIpv6)
+
+	if addr := getPrimaryConnectionAddress(publicIpv4, privateIpv4, publicIpv6); addr != "" {
+		log.Printf("[INFO] Setting connection host to: '%s'", addr)
+		d.SetConnInfo(map[string]string{
+			"type": "ssh",
+			"host": addr,
+		})
+	} else {
+		log.Printf("[INFO] No connection host found")
+	}
 
 	return nil
 }
