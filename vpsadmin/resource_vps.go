@@ -17,62 +17,73 @@ func resourceVps() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"location": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "Location label",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"node": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Description: "Read-only node name",
+				Computed:    true,
 			},
 			"os_template": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Description: "OS template to base this VPS on",
+				Required:    true,
+				ForceNew:    true,
 			},
 			"hostname": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Description: "VPS hostname managed by vpsAdmin",
+				Required:    true,
 			},
 			"cpu": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Description: "Number of CPU cores",
+				Required:    true,
 			},
 			"memory": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type   :     schema.TypeInt,
+				Description: "Available memory in MB",
+				Required:    true,
 			},
 			"swap": &schema.Schema{
-				Type:     schema.TypeInt,
-				Default:  0,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "Available swap in MB",
+				Default:     0,
+				Optional:    true,
 			},
 			"diskspace": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Description: "Root dataset's size in MB",
+				Required:    true,
 			},
 			"public_ipv4_count": &schema.Schema{
-				Type:     schema.TypeInt,
-				Default:  1,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "Number of public IPv4 addresses to add when the VPS is created",
+				Default:     1,
+				Optional:    true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					// This field is used only when the VPS is being created
 					return d.Id() != ""
 				},
 			},
 			"private_ipv4_count": &schema.Schema{
-				Type:     schema.TypeInt,
-				Default:  0,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "Number of private IPv4 addresses to add when the VPS is created",
+				Default:     0,
+				Optional:    true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					// This field is used only when the VPS is being created
 					return d.Id() != ""
 				},
 			},
 			"public_ipv6_count": &schema.Schema{
-				Type:     schema.TypeInt,
-				Default:  1,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Description: "Number of public IPv6 addresses to add when the VPS is created",
+				Default:     1,
+				Optional:    true,
 				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
 					// This field is used only when the VPS is being created
 					return d.Id() != ""
