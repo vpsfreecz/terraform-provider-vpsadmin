@@ -2,6 +2,7 @@ package vpsadmin
 
 import (
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 	"github.com/vpsfreecz/vpsadmin-go-client/client"
 	"fmt"
 	"log"
@@ -107,6 +108,15 @@ func resourceVps() *schema.Resource {
 					return d.Id() != ""
 				},
 			},
+			"ssh_keys": &schema.Schema{
+				Type:        schema.TypeSet,
+				Description: "List of SSH key IDs to append to /root/.ssh_authorized_keys",
+				Optional:    true,
+				Elem: &schema.Schema{
+					Type:         schema.TypeString,
+					ValidateFunc: validation.NoZeroValues,
+				},
+			},
 		},
 	}
 }
@@ -155,6 +165,12 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	d.SetId(strconv.FormatInt(resp.Output.Id, 10))
+
+	if keys, ok := d.GetOk("ssh_keys"); ok {
+		if err := deploySshKeys(api, resp.Output.Id, keys.(*schema.Set).List()); err != nil {
+			return err
+		}
+	}
 
 	return resourceVpsRead(d, m)
 }
@@ -271,6 +287,14 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 		d.SetPartial("diskspace")
 	}
 
+	if d.HasChange("ssh_keys") {
+		if err := deploySshKeys(api, int64(id), d.Get("ssh_keys").(*schema.Set).List()); err != nil {
+			return err
+		}
+
+		d.SetPartial("ssh_keys")
+	}
+
 	d.Partial(false)
 
 	return resourceVpsRead(d, m)
@@ -316,4 +340,39 @@ func resourceVpsImport(d *schema.ResourceData, m interface{}) ([]*schema.Resourc
 	results[0] = d
 
 	return results, nil
+}
+
+func deploySshKeys(api *client.Client, vpsId int64, sshKeys []interface{}) error {
+	for _, v := range sshKeys {
+		keyId := v.(string)
+
+		deploy := api.Vps.DeployPublicKey.Prepare()
+		deploy.SetPathParamInt("vps_id", vpsId)
+
+		input := deploy.NewInput()
+
+		n, err := strconv.ParseInt(keyId, 10, 64)
+
+		if err != nil {
+			return err
+		}
+
+		input.SetPublicKey(n)
+
+		log.Printf("[INFO] Deploying SSH key %d to VPS %d", n, vpsId)
+
+		resp, err := deploy.Call()
+
+		if err != nil {
+			return err
+		} else if !resp.Status {
+			return fmt.Errorf("SSH key deploy failed: %s", resp.Message)
+		}
+
+		if err := waitForOperation(resp); err != nil {
+			return fmt.Errorf("SSH key deploy failed: %v", err)
+		}
+	}
+
+	return nil
 }
