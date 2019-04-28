@@ -20,14 +20,13 @@ func getPrimaryPublicHostIpv6Address(api *client.Client, vpsId int64) string {
 func getPrimaryHostIpAddress(api *client.Client, vpsId int64, ipVersion int, role string) string {
 	action := api.HostIpAddress.Index.Prepare()
 
-	input := &client.ActionHostIpAddressIndexInput{}
+	input := action.NewInput()
 	input.SetVps(vpsId)
 	input.SetVersion(int64(ipVersion))
 	input.SetRole(role)
 	input.SetAssigned(true)
 	input.SetLimit(1)
 
-	action.SetInput(input)
 	log.Printf("[DEBUG] Listing host IP addresses: %+v", input)
 
 	resp, err := action.Call()

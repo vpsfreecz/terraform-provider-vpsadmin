@@ -125,7 +125,7 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 
 	create := api.Vps.Create.Prepare()
 
-	input := &client.ActionVpsCreateInput{}
+	input := create.NewInput()
 	input.SetLocation(locationId)
 	input.SetOsTemplate(templateId)
 	input.SetHostname(d.Get("hostname").(string))
@@ -136,8 +136,6 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	input.SetIpv4(int64(d.Get("public_ipv4_count").(int)))
 	input.SetIpv4Private(int64(d.Get("private_ipv4_count").(int)))
 	input.SetIpv6(int64(d.Get("public_ipv6_count").(int)))
-
-	create.SetInput(input)
 
 	log.Printf("[DEBUG] VPS create configuration: %#v", create.Input)
 
@@ -209,7 +207,7 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 	vpsUpdate := api.Vps.Update.Prepare()
 	vpsUpdate.SetPathParamInt("vps_id", int64(id))
 
-	input := &client.ActionVpsUpdateInput{}
+	input := vpsUpdate.NewInput()
 
 	if d.HasChange("hostname") {
 		input.SetHostname(d.Get("hostname").(string))
@@ -228,8 +226,6 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if input.AnySelected() {
-		vpsUpdate.SetInput(input)
-
 		vpsResp, err := vpsUpdate.Call()
 
 		if err != nil {
