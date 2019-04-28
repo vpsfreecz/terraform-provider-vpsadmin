@@ -14,6 +14,9 @@ func resourceVps() *schema.Resource {
 		Read:   resourceVpsRead,
 		Update: resourceVpsUpdate,
 		Delete: resourceVpsDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceVpsImport,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"location": &schema.Schema{
@@ -300,4 +303,17 @@ func resourceVpsDelete(d *schema.ResourceData, m interface{}) error {
 	}
 
 	return nil
+}
+
+func resourceVpsImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	err := resourceVpsRead(d, m)
+
+	if err != nil {
+		return nil, fmt.Errorf("invalid VPS id: %v", err)
+	}
+
+	results := make([]*schema.ResourceData, 1)
+	results[0] = d
+
+	return results, nil
 }
