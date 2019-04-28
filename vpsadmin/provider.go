@@ -22,6 +22,9 @@ func Provider() terraform.ResourceProvider {
 				Description: "The URL to use for the vpsAdmin API.",
 			},
 		},
+		DataSourcesMap: map[string]*schema.Resource{
+			"vpsadmin_vps": dataSourceVps(),
+		},
 		ResourcesMap: map[string]*schema.Resource{
 			"vpsadmin_ssh_key": resourceSshKey(),
 			"vpsadmin_vps": resourceVps(),
