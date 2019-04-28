@@ -59,6 +59,21 @@ func resourceVps() *schema.Resource {
 				Description: "Root dataset's size in MB",
 				Required:    true,
 			},
+			"public_ipv4_address": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Primary public IPv4 address",
+				Computed:    true,
+			},
+			"private_ipv4_address": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Primary private IPv4 address",
+				Computed:    true,
+			},
+			"public_ipv6_address": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Primary public IPv6 address",
+				Computed:    true,
+			},
 			"public_ipv4_count": &schema.Schema{
 				Type:        schema.TypeInt,
 				Description: "Number of public IPv4 addresses to add when the VPS is created",
@@ -173,6 +188,9 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("memory", vps.Memory)
 	d.Set("swap", vps.Swap)
 	d.Set("diskspace", ds.Refquota)
+	d.Set("public_ipv4_address", getPrimaryPublicHostIpv4Address(api, vps.Id))
+	d.Set("private_ipv4_address", getPrimaryPrivateHostIpv4Address(api, vps.Id))
+	d.Set("public_ipv6_address", getPrimaryPublicHostIpv6Address(api, vps.Id))
 
 	return nil
 }

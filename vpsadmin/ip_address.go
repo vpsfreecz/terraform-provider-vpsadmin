@@ -1,0 +1,46 @@
+package vpsadmin
+
+import (
+	"log"
+	"github.com/vpsfreecz/vpsadmin-go-client/client"
+)
+
+func getPrimaryPublicHostIpv4Address(api *client.Client, vpsId int64) string {
+	return getPrimaryHostIpAddress(api, vpsId, 4, "public_access")
+}
+
+func getPrimaryPrivateHostIpv4Address(api *client.Client, vpsId int64) string {
+	return getPrimaryHostIpAddress(api, vpsId, 4, "private_access")
+}
+
+func getPrimaryPublicHostIpv6Address(api *client.Client, vpsId int64) string {
+	return getPrimaryHostIpAddress(api, vpsId, 6, "public_access")
+}
+
+func getPrimaryHostIpAddress(api *client.Client, vpsId int64, ipVersion int, role string) string {
+	action := api.HostIpAddress.Index.Prepare()
+
+	input := &client.ActionHostIpAddressIndexInput{}
+	input.SetVps(vpsId)
+	input.SetVersion(int64(ipVersion))
+	input.SetRole(role)
+	input.SetAssigned(true)
+	input.SetLimit(1)
+
+	action.SetInput(input)
+	log.Printf("[DEBUG] Listing host IP addresses: %+v", input)
+
+	resp, err := action.Call()
+
+	if err != nil {
+		log.Printf("[INFO] Failed to list host IP addresses: %v", err)
+		return ""
+	} else if !resp.Status {
+		log.Printf("[INFO] Failed to list host IP addresses: %s", resp.Message)
+		return ""
+	} else if len(resp.Output) == 0 {
+		return ""
+	}
+
+	return resp.Output[0].Addr
+}
