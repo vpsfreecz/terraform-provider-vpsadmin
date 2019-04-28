@@ -51,6 +51,33 @@ func resourceVps() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"public_ipv4_count": &schema.Schema{
+				Type:     schema.TypeInt,
+				Default:  1,
+				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// This field is used only when the VPS is being created
+					return d.Id() != ""
+				},
+			},
+			"private_ipv4_count": &schema.Schema{
+				Type:     schema.TypeInt,
+				Default:  0,
+				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// This field is used only when the VPS is being created
+					return d.Id() != ""
+				},
+			},
+			"public_ipv6_count": &schema.Schema{
+				Type:     schema.TypeInt,
+				Default:  1,
+				Optional: true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					// This field is used only when the VPS is being created
+					return d.Id() != ""
+				},
+			},
 		},
 	}
 }
@@ -79,10 +106,14 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 		Memory: int64(d.Get("memory").(int)),
 		Swap: int64(d.Get("swap").(int)),
 		Diskspace: int64(d.Get("diskspace").(int)),
+		Ipv4: int64(d.Get("public_ipv4_count").(int)),
+		Ipv4Private: int64(d.Get("private_ipv4_count").(int)),
+		Ipv6: int64(d.Get("public_ipv6_count").(int)),
 	})
 	create.Input.SelectParameters(
 		"Location", "OsTemplate", "Hostname",
 		"Cpu", "Memory", "Swap", "Diskspace",
+		"Ipv4", "Ipv4Private", "Ipv6",
 	)
 
 	log.Printf("[DEBUG] VPS create configuration: %#v", create.Input)
