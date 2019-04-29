@@ -38,9 +38,26 @@ func resourceVps() *schema.Resource {
 				ForceNew:    true,
 			},
 			"hostname": &schema.Schema{
-				Type:        schema.TypeString,
-				Description: "VPS hostname managed by vpsAdmin",
-				Required:    true,
+				Type:          schema.TypeString,
+				Description:   "VPS hostname managed by vpsAdmin",
+				Optional:      true,
+				Default:       "vps",
+				ConflictsWith: []string{"manage_hostname"},
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return !d.Get("manage_hostname").(bool)
+				},
+			},
+			"real_hostname": &schema.Schema{
+				Type:          schema.TypeString,
+				Description:   "VPS hostname as reported by the VPS",
+				Computed:      true,
+			},
+			"manage_hostname": &schema.Schema{
+				Type:          schema.TypeBool,
+				Description:   "Manage hostname by vpsAdmin if true, manually if false",
+				Default:       true,
+				Optional:      true,
+				ConflictsWith: []string{"hostname"},
 			},
 			"cpu": &schema.Schema{
 				Type:        schema.TypeInt,
@@ -136,12 +153,20 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	manageHostname := d.Get("manage_hostname").(bool)
+
 	create := api.Vps.Create.Prepare()
 
 	input := create.NewInput()
 	input.SetLocation(locationId)
 	input.SetOsTemplate(templateId)
-	input.SetHostname(d.Get("hostname").(string))
+
+	if manageHostname {
+		input.SetHostname(d.Get("hostname").(string))
+	} else {
+		input.SetHostname("vps")
+	}
+
 	input.SetCpu(int64(d.Get("cpu").(int)))
 	input.SetMemory(int64(d.Get("memory").(int)))
 	input.SetSwap(int64(d.Get("swap").(int)))
@@ -165,6 +190,27 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	d.SetId(strconv.FormatInt(resp.Output.Id, 10))
+
+	if !manageHostname {
+		update := api.Vps.Update.Prepare()
+		update.SetPathParamInt("vps_id", resp.Output.Id)
+		updateInput := update.NewInput()
+		updateInput.SetManageHostname(false)
+
+		log.Printf("[DEBUG] Configuring manual hostname management")
+
+		updateResp, err := update.Call()
+
+		if err != nil {
+			return err
+		} else if !updateResp.Status {
+			return fmt.Errorf("VPS update failed: %s", updateResp.Message)
+		}
+
+		if err := waitForOperation(updateResp); err != nil {
+			return fmt.Errorf("VPS update failed: %v", err)
+		}
+	}
 
 	if keys, ok := d.GetOk("ssh_keys"); ok {
 		if err := deploySshKeys(api, resp.Output.Id, keys.(*schema.Set).List()); err != nil {
@@ -205,6 +251,8 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("node", vps.Node.DomainName)
 	d.Set("os_template", vps.OsTemplate.Name)
 	d.Set("hostname", vps.Hostname)
+	d.Set("real_hostname", vps.Hostname)
+	d.Set("manage_hostname", vps.ManageHostname)
 	d.Set("cpu", vps.Cpu)
 	d.Set("memory", vps.Memory)
 	d.Set("swap", vps.Swap)
@@ -244,6 +292,10 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChange("hostname") {
 		input.SetHostname(d.Get("hostname").(string))
+	}
+
+	if d.HasChange("manage_hostname") {
+		input.SetManageHostname(d.Get("manage_hostname").(bool))
 	}
 
 	if d.HasChange("cpu") {
