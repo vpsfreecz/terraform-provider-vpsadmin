@@ -24,6 +24,10 @@ type options struct {
 func main() {
 	opts := parseOptions()
 
+	if opts == nil {
+		return
+	}
+
 	if err := getCredentials(opts); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v", err)
 		return
@@ -86,8 +90,9 @@ func parseOptions() *options {
 	args := flag.Args()
 
 	if len(args) > 1 {
-		fmt.Fprintf(os.Stderr, "Error: too many arguments")
-		flag.PrintDefaults()
+		fmt.Fprintf(os.Stderr, "Error: too many arguments\n")
+		flag.Usage()
+		return nil
 	} else if len(args) == 1 {
 		opts.apiUrl = args[0]
 	} else {
