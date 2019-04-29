@@ -2,3 +2,6 @@
 terraform-provider-vpsadmin
 terraform.tfstate
 terraform.tfstate.backup
+/*.tf
+/*.tfvars
+crash.log
