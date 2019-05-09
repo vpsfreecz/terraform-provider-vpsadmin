@@ -128,14 +128,28 @@ func getCredentials(opts *options) error {
 	return nil
 }
 
+func getTotpCode(input *client.AuthTokenActionTokenTotpInput) error {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("TOTP code: ")
+	code, err := reader.ReadString('\n')
+
+	if err != nil {
+		return err
+	}
+
+	input.SetCode(strings.TrimSpace(code))
+	return nil
+}
+
 func getToken(opts *options) (string, error) {
 	api := client.New(opts.apiUrl)
-	err := api.SetNewTokenAuth(
-		opts.username,
-		opts.password,
-		opts.lifetime,
-		opts.interval,
-	)
+	err := api.SetNewTokenAuth(&client.TokenAuthOptions{
+		User: opts.username,
+		Password: opts.password,
+		Lifetime: opts.lifetime,
+		Interval: int64(opts.interval),
+		TotpCallback: getTotpCode,
+	})
 
 	if err != nil {
 		return "", err
