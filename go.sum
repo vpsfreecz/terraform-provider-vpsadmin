@@ -179,6 +179,8 @@ github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190427162842-becb1ee3d86a h1:zl
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190427162842-becb1ee3d86a/go.mod h1:7KhS63T9391PkqZIMTmWMcBAUZOsacpZ4EmG6+EJc0c=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190428133934-5ed77240d9ae h1:3icGBEuVpRxmtGmIC26BgM1T9+ss8WQvShX9rbjIeas=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190428133934-5ed77240d9ae/go.mod h1:7KhS63T9391PkqZIMTmWMcBAUZOsacpZ4EmG6+EJc0c=
+github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190513133338-b61d52bb0271 h1:p9NPNieRPniEKP0T+q3jP5xUU/ST1ZQDQTHr5KEZ4rE=
+github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190513133338-b61d52bb0271/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 github.com/xanzy/ssh-agent v0.2.0/go.mod h1:0NyE30eGUDliuLEHJgYte/zncp2zdTStcOnWhgSqHD8=
 github.com/xiang90/probing v0.0.0-20160813154853-07dd2e8dfe18/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xlab/treeprint v0.0.0-20161029104018-1d6e34225557/go.mod h1:ce1O1j6UtZfjr22oyGxGLbauSBp2YVXpARAosm7dHBg=
