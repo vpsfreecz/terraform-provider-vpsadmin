@@ -32,7 +32,7 @@ func configureClient(apiUrl string, authToken string) (*Config, error) {
 func waitForOperation(watcher client.BlockingOperationWatcher) error {
 	if watcher.IsBlocking() {
 		for i := 0; i < 60; i++ {
-			resp, err := watcher.WaitForOperation(60)
+			resp, err := watcher.WaitForOperation(30)
 
 			if err != nil {
 				return err
