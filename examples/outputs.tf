@@ -1,11 +1,12 @@
-output "Public IPv4" {
-  value = "${vpsadmin_vps.my-vps.public_ipv4_address}"
+output "PublicIPv4" {
+  value = vpsadmin_vps.my-vps.public_ipv4_address
 }
 
-output "Private IPv4" {
-  value = "${vpsadmin_vps.my-vps.private_ipv4_address}"
+output "PrivateIPv4" {
+  value = vpsadmin_vps.my-vps.private_ipv4_address
 }
 
-output "Public IPv6" {
-  value = "${vpsadmin_vps.my-vps.public_ipv6_address}"
+output "PublicIPv6" {
+  value = vpsadmin_vps.my-vps.public_ipv6_address
 }
+
