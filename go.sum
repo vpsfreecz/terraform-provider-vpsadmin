@@ -347,6 +347,8 @@ github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202082221-bbf8e38f5487 h1:ea
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202082221-bbf8e38f5487/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202085032-f391f9866c75 h1:vmLCamwVX63MlLhyTEhJ4DTF99PDEJfvoTpHWF0J7yw=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202085032-f391f9866c75/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
+github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27 h1:VcU+1kDUI+MGkFg1U4HlzUsM+r6LDw2apDb9DHl5A9U=
+github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 github.com/xanzy/ssh-agent v0.2.1 h1:TCbipTQL2JiiCprBWx9frJ2eJlCYT00NmctrHxVAr70=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xiang90/probing v0.0.0-20160813154853-07dd2e8dfe18/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
