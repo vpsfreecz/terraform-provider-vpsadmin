@@ -17,10 +17,16 @@ resource "vpsadmin_ssh_key" "my-key" {
 
 resource "vpsadmin_vps" "my-vps" {
   # Location label
+  # Possible values
+  #   - using vpsfree-client: vpsfreectl location list -o label
+  #   - using curl: curl https://api.vpsfree.cz/locations
   location = "Praha"
 
-  # OS template name, see vpsfreectl os_template list -o name
-  os_template = "ubuntu-18.04-x86_64-vpsfree"
+  # OS template name
+  # Possible values
+  #   - using vpsfree-client: vpsfreectl os_template list -o name
+  #   - using curl: curl https://api.vpsfree.cz/os_templates
+  os_template = "ubuntu-20.04-x86_64-vpsadminos-minimal"
 
   # vpsAdmin-managed hostname
   hostname = "my-vps"
