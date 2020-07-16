@@ -1,11 +1,3 @@
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190428133934-5ed77240d9ae h1:3icGBEuVpRxmtGmIC26BgM1T9+ss8WQvShX9rbjIeas=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190428133934-5ed77240d9ae/go.mod h1:7KhS63T9391PkqZIMTmWMcBAUZOsacpZ4EmG6+EJc0c=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190509164310-b64f63393798 h1:po6UsNC6s1j5bFWr+rFi+pFurGzdaT3+VGwL4nfPXdA=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190509164310-b64f63393798/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202082221-bbf8e38f5487 h1:eauumpIgOyXoSmuoW/wkqJ6Gvx/RQ0M/7R9+KodF/a0=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202082221-bbf8e38f5487/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202085032-f391f9866c75 h1:vmLCamwVX63MlLhyTEhJ4DTF99PDEJfvoTpHWF0J7yw=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202085032-f391f9866c75/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27 h1:VcU+1kDUI+MGkFg1U4HlzUsM+r6LDw2apDb9DHl5A9U=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

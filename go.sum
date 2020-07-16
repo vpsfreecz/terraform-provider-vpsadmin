@@ -341,12 +341,6 @@ github.com/ulikunitz/xz v0.5.5/go.mod h1:2bypXElzHzzJZwzH67Y6wb67pO62Rzfn7BSiF4A
 github.com/vmihailenco/msgpack v3.3.3+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
 github.com/vmihailenco/msgpack v4.0.1+incompatible h1:RMF1enSPeKTlXrXdOcqjFUElywVZjjC6pqse21bKbEU=
 github.com/vmihailenco/msgpack v4.0.1+incompatible/go.mod h1:fy3FlTQTDXWkZ7Bh6AcGMlsjHatGryHQYUTf1ShIgkk=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190513133338-b61d52bb0271 h1:p9NPNieRPniEKP0T+q3jP5xUU/ST1ZQDQTHr5KEZ4rE=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20190513133338-b61d52bb0271/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202082221-bbf8e38f5487 h1:eauumpIgOyXoSmuoW/wkqJ6Gvx/RQ0M/7R9+KodF/a0=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202082221-bbf8e38f5487/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202085032-f391f9866c75 h1:vmLCamwVX63MlLhyTEhJ4DTF99PDEJfvoTpHWF0J7yw=
-github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20191202085032-f391f9866c75/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27 h1:VcU+1kDUI+MGkFg1U4HlzUsM+r6LDw2apDb9DHl5A9U=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
 github.com/xanzy/ssh-agent v0.2.1 h1:TCbipTQL2JiiCprBWx9frJ2eJlCYT00NmctrHxVAr70=
