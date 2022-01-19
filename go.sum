@@ -274,6 +274,8 @@ github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+
 github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgqMEUPoW2WPyhdI=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27 h1:VcU+1kDUI+MGkFg1U4HlzUsM+r6LDw2apDb9DHl5A9U=
 github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27/go.mod h1:XH87t8/73DpNyEQR+VvlzJuc17dWfwz8XMKCy4thjns=
+github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20220119162345-235e0d23ff12 h1:xaxo6yPwRAICno2BmWo4AAt7G8aeYrJDlGNTlKo5vgs=
+github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20220119162345-235e0d23ff12/go.mod h1:n7aZvL8Z1XGeKF6lDkdmsfGdBOh8SiKxl07FXjpGygw=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

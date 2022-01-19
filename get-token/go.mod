@@ -3,6 +3,6 @@ module github.com/vpsfreecz/terraform-provider-vpsadmin/get-token
 go 1.16
 
 require (
-	github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20200313072921-575ba716cf27
+	github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20220119162345-235e0d23ff12
 	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734
 )
