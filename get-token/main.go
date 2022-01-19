@@ -13,10 +13,10 @@ import (
 )
 
 type options struct {
-	apiUrl string
+	apiUrl   string
 	lifetime string
 	interval int
-	tfvars string
+	tfvars   string
 	username string
 	password string
 }
@@ -106,7 +106,7 @@ func getCredentials(opts *options) error {
 	reader := bufio.NewReader(os.Stdin)
 
 	if opts.username == "" {
-	    fmt.Print("Username: ")
+		fmt.Print("Username: ")
 		username, err := reader.ReadString('\n')
 
 		if err != nil {
@@ -116,13 +116,13 @@ func getCredentials(opts *options) error {
 		opts.username = strings.TrimSpace(username)
 	}
 
-    fmt.Print("Password: ")
-    bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Print("Password: ")
+	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 	fmt.Print("\n")
 
 	if err != nil {
 		return err
-    }
+	}
 
 	opts.password = strings.TrimSpace(string(bytePassword))
 	return nil
@@ -144,10 +144,10 @@ func getTotpCode(input *client.AuthTokenActionTokenTotpInput) error {
 func getToken(opts *options) (string, error) {
 	api := client.New(opts.apiUrl)
 	err := api.SetNewTokenAuth(&client.TokenAuthOptions{
-		User: opts.username,
-		Password: opts.password,
-		Lifetime: opts.lifetime,
-		Interval: int64(opts.interval),
+		User:         opts.username,
+		Password:     opts.password,
+		Lifetime:     opts.lifetime,
+		Interval:     int64(opts.interval),
 		TotpCallback: getTotpCode,
 	})
 
