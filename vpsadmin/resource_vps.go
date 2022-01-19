@@ -1,8 +1,8 @@
 package vpsadmin
 
 import (
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/vpsfreecz/vpsadmin-go-client/client"
 	"fmt"
 	"log"
@@ -322,11 +322,6 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 		if err := waitForOperation(vpsResp); err != nil {
 			return fmt.Errorf("VPS update failed: %v", err)
 		}
-
-		d.SetPartial("hostname")
-		d.SetPartial("cpu")
-		d.SetPartial("memory")
-		d.SetPartial("swap")
 	}
 
 	if d.HasChange("diskspace") {
@@ -349,16 +344,12 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 		if err := waitForOperation(datasetResp); err != nil {
 			return fmt.Errorf("Dataset update failed: %v", err)
 		}
-
-		d.SetPartial("diskspace")
 	}
 
 	if d.HasChange("ssh_keys") {
 		if err := deploySshKeys(api, int64(id), d.Get("ssh_keys").(*schema.Set).List()); err != nil {
 			return err
 		}
-
-		d.SetPartial("ssh_keys")
 	}
 
 	d.Partial(false)
