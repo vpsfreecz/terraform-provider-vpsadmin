@@ -4,7 +4,7 @@ and deploys a public key.
 
 ## Obtaining API authentication token
 The provider needs an authentication token to the vpsAdmin API. The token can
-be obtain using any of [HaveAPI clients](https://github.com/vpsfreecz/haveapi),
+be obtained using any of [HaveAPI clients](https://github.com/vpsfreecz/haveapi),
 but the provider also comes with a simple CLI utility [get-token](../get-token).
 
 For this example, the token should be put in an arbitrary tfvars file, e.g.
