@@ -5,6 +5,7 @@ import (
 	"github.com/vpsfreecz/terraform-provider-vpsadmin/vpsadmin"
 )
 
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 func main() {
 	plugin.Serve(&plugin.ServeOpts{ProviderFunc: vpsadmin.Provider})
 }

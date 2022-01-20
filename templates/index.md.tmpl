@@ -1,0 +1,31 @@
+---
+page_title: "vpsAdmin Provider for vpsFree.cz"
+subcategory: ""
+description: |-
+  Provider for vpsFree.cz using the vpsAdmin API
+---
+
+# vpsAdmin Provider
+vpsAdmin provider can be used to manage resources on
+[vpsFree.cz](https://vpsfree.org) using vpsAdmin API. The provider supports
+basic management of virtual servers (VPS) and public keys for access over SSH.
+
+## Obtaining API authentication token
+The provider needs an authentication token to the vpsAdmin API. The token can
+be obtained using any of [HaveAPI clients](https://github.com/vpsfreecz/haveapi),
+but the provider also comes with a simple CLI utility
+[get-token](https://github.com/vpsfreecz/terraform-provider-vpsadmin/tree/master/get-token).
+
+The authentication token should be put in an arbitrary tfvars file, e.g.
+`token.auto.tfvars`:
+
+```
+vpsadmin_token = "your token"
+```
+
+## Example usage
+{{tffile "examples/main.tf"}}
+
+See more at https://github.com/vpsfreecz/terraform-provider-vpsadmin/tree/master/examples.
+
+{{ .SchemaMarkdown | trimspace }}
