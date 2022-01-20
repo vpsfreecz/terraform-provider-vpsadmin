@@ -3,7 +3,7 @@ terraform {
 
   required_providers {
     vpsadmin = {
-      source  = "terraform.vpsfree.cz/vpsfreecz/vpsadmin"
+      source  = "vpsfreecz/vpsadmin"
       version = ">= 0.2"
     }
   }
