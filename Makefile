@@ -10,8 +10,12 @@ build:
 docs:
 	go generate
 
+fmt:
+	go fmt
+	cd vpsadmin && go fmt
+
 install:
 	mkdir -p $(PLUGIN_DIR)/$(PROVIDER_DIR)
 	cp -p $(TARGET) $(PLUGIN_DIR)/$(PROVIDER_DIR)/
 
-.PHONY: build docs install
+.PHONY: build docs fmt install
