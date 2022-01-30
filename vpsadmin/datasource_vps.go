@@ -1,14 +1,14 @@
 package vpsadmin
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
 )
 
 func dataSourceVps() *schema.Resource {
 	return &schema.Resource{
-		Read:   dataSourceVpsRead,
+		Read: dataSourceVpsRead,
 
 		Schema: map[string]*schema.Schema{
 			"vps_id": &schema.Schema{
@@ -42,7 +42,7 @@ func dataSourceVps() *schema.Resource {
 				Computed:    true,
 			},
 			"memory": &schema.Schema{
-				Type   :     schema.TypeInt,
+				Type:        schema.TypeInt,
 				Description: "Available memory in MB",
 				Computed:    true,
 			},
@@ -72,29 +72,29 @@ func dataSourceVps() *schema.Resource {
 				Computed:    true,
 			},
 			"feature_fuse": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to FUSE filesystems",
-				Computed: true,
+				Computed:    true,
 			},
 			"feature_kvm": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to /dev/kvm for hardware virtualization",
-				Computed: true,
+				Computed:    true,
 			},
 			"feature_lxc": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Enable support for LXC/LXD containers",
-				Computed: true,
+				Computed:    true,
 			},
 			"feature_ppp": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to /dev/ppp",
-				Computed: true,
+				Computed:    true,
 			},
 			"feature_tun": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to /dev/net/tun, e.g. for VPNs",
-				Computed: true,
+				Computed:    true,
 			},
 		},
 	}

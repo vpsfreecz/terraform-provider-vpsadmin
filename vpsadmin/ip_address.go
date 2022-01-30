@@ -1,8 +1,8 @@
 package vpsadmin
 
 import (
-	"log"
 	"github.com/vpsfreecz/vpsadmin-go-client/client"
+	"log"
 )
 
 func getPrimaryPublicHostIpv4Address(api *client.Client, vpsId int64) string {

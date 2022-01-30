@@ -1,14 +1,14 @@
 package vpsadmin
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"strconv"
 )
 
 func dataSourceSshKey() *schema.Resource {
 	return &schema.Resource{
-		Read:   dataSourceSshKeyRead,
+		Read: dataSourceSshKeyRead,
 
 		Schema: map[string]*schema.Schema{
 			"label": &schema.Schema{

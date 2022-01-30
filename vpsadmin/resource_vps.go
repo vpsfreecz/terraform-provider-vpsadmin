@@ -1,10 +1,10 @@
 package vpsadmin
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/vpsfreecz/vpsadmin-go-client/client"
-	"fmt"
 	"log"
 	"strconv"
 )
@@ -48,9 +48,9 @@ func resourceVps() *schema.Resource {
 				},
 			},
 			"real_hostname": &schema.Schema{
-				Type:          schema.TypeString,
-				Description:   "VPS hostname as reported by the VPS",
-				Computed:      true,
+				Type:        schema.TypeString,
+				Description: "VPS hostname as reported by the VPS",
+				Computed:    true,
 			},
 			"manage_hostname": &schema.Schema{
 				Type:          schema.TypeBool,
@@ -65,7 +65,7 @@ func resourceVps() *schema.Resource {
 				Required:    true,
 			},
 			"memory": &schema.Schema{
-				Type   :     schema.TypeInt,
+				Type:        schema.TypeInt,
 				Description: "Available memory in MB",
 				Required:    true,
 			},
@@ -135,33 +135,33 @@ func resourceVps() *schema.Resource {
 				},
 			},
 			"feature_fuse": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to FUSE filesystems",
-				Default: true,
+				Default:     true,
 				Optional:    true,
 			},
 			"feature_kvm": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to /dev/kvm for hardware virtualization",
-				Default: true,
+				Default:     true,
 				Optional:    true,
 			},
 			"feature_lxc": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Enable support for LXC/LXD containers",
-				Default: false,
+				Default:     false,
 				Optional:    true,
 			},
 			"feature_ppp": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to /dev/ppp",
-				Default: false,
+				Default:     false,
 				Optional:    true,
 			},
 			"feature_tun": {
-				Type: schema.TypeBool,
+				Type:        schema.TypeBool,
 				Description: "Allow access to /dev/net/tun, e.g. for VPNs",
-				Default: true,
+				Default:     true,
 				Optional:    true,
 			},
 		},

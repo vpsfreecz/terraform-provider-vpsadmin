@@ -1,8 +1,8 @@
 package vpsadmin
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"log"
 	"strconv"
 	"strings"
@@ -28,7 +28,7 @@ func resourceSshKey() *schema.Resource {
 				Type:        schema.TypeString,
 				Description: "Public key",
 				Required:    true,
-				StateFunc:   func(val interface{}) string {
+				StateFunc: func(val interface{}) string {
 					return strings.TrimSpace(val.(string))
 				},
 			},
