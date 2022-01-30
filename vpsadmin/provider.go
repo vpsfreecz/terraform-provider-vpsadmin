@@ -22,10 +22,12 @@ func Provider() *schema.Provider {
 			},
 		},
 		DataSourcesMap: map[string]*schema.Resource{
+			"vpsadmin_dataset": dataSourceDataset(),
 			"vpsadmin_ssh_key": dataSourceSshKey(),
 			"vpsadmin_vps":     dataSourceVps(),
 		},
 		ResourcesMap: map[string]*schema.Resource{
+			"vpsadmin_dataset": resourceDataset(),
 			"vpsadmin_ssh_key": resourceSshKey(),
 			"vpsadmin_vps":     resourceVps(),
 		},
