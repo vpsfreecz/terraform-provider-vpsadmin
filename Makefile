@@ -7,8 +7,11 @@ PROVIDER_DIR = terraform.vpsfree.cz/vpsfreecz/vpsadmin/$(VERSION)/$(PLATFORM)
 build:
 	go build -o $(TARGET)
 
+docs:
+	go generate
+
 install:
 	mkdir -p $(PLUGIN_DIR)/$(PROVIDER_DIR)
 	cp -p $(TARGET) $(PLUGIN_DIR)/$(PROVIDER_DIR)/
 
-.PHONY: build install
+.PHONY: build docs install
