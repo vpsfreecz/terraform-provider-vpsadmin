@@ -25,6 +25,11 @@ description: |-
 
 ### Optional
 
+- **feature_fuse** (Boolean) Allow access to FUSE filesystems
+- **feature_kvm** (Boolean) Allow access to /dev/kvm for hardware virtualization
+- **feature_lxc** (Boolean) Enable support for LXC/LXD containers
+- **feature_ppp** (Boolean) Allow access to /dev/ppp
+- **feature_tun** (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
 - **hostname** (String) VPS hostname managed by vpsAdmin
 - **id** (String) The ID of this resource.
 - **manage_hostname** (Boolean) Manage hostname by vpsAdmin if true, manually if false

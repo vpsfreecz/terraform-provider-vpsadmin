@@ -39,8 +39,7 @@ resource "vpsadmin_ssh_key" "my-key" {
   label = "My public key"
 
   # Set your public key here. The file has to contain exactly one public key.
-  #key = file("~/.ssh/my_key.pub")
-  key = file("~/.ssh/test_ecdsa.pub")
+  key = file("~/.ssh/my_key.pub")
 }
 
 resource "vpsadmin_vps" "my-vps" {
@@ -86,8 +85,7 @@ resource "vpsadmin_vps" "my-vps" {
       host = vpsadmin_vps.my-vps.public_ipv4_address
 
       # Set your private key here
-      #private_key = file("~/.ssh/my_key")
-      private_key = file("~/.ssh/test_ecdsa")
+      private_key = file("~/.ssh/my_key")
       user        = "root"
       timeout     = "2m"
     }

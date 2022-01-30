@@ -27,6 +27,11 @@ description: |-
 
 - **cpu** (Number) Number of CPU cores
 - **diskspace** (Number) Root dataset's size in MB
+- **feature_fuse** (Boolean) Allow access to FUSE filesystems
+- **feature_kvm** (Boolean) Allow access to /dev/kvm for hardware virtualization
+- **feature_lxc** (Boolean) Enable support for LXC/LXD containers
+- **feature_ppp** (Boolean) Allow access to /dev/ppp
+- **feature_tun** (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
 - **hostname** (String) VPS hostname managed by vpsAdmin
 - **location** (String) Location label
 - **memory** (Number) Available memory in MB

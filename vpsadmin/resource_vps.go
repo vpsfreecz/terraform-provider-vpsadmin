@@ -134,6 +134,36 @@ func resourceVps() *schema.Resource {
 					ValidateFunc: validation.NoZeroValues,
 				},
 			},
+			"feature_fuse": {
+				Type: schema.TypeBool,
+				Description: "Allow access to FUSE filesystems",
+				Default: true,
+				Optional:    true,
+			},
+			"feature_kvm": {
+				Type: schema.TypeBool,
+				Description: "Allow access to /dev/kvm for hardware virtualization",
+				Default: true,
+				Optional:    true,
+			},
+			"feature_lxc": {
+				Type: schema.TypeBool,
+				Description: "Enable support for LXC/LXD containers",
+				Default: false,
+				Optional:    true,
+			},
+			"feature_ppp": {
+				Type: schema.TypeBool,
+				Description: "Allow access to /dev/ppp",
+				Default: false,
+				Optional:    true,
+			},
+			"feature_tun": {
+				Type: schema.TypeBool,
+				Description: "Allow access to /dev/net/tun, e.g. for VPNs",
+				Default: true,
+				Optional:    true,
+			},
 		},
 	}
 }
@@ -191,6 +221,7 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 
 	d.SetId(strconv.FormatInt(resp.Output.Id, 10))
 
+	// Hostname
 	if !manageHostname {
 		update := api.Vps.Update.Prepare()
 		update.SetPathParamInt("vps_id", resp.Output.Id)
@@ -212,6 +243,39 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 		}
 	}
 
+	// VPS features
+	featureSet := api.Vps.Feature.UpdateAll.Prepare()
+	featureSet.SetPathParamInt("vps_id", resp.Output.Id)
+	featureInput := featureSet.NewInput()
+
+	for _, name := range supportedVpsFeatures {
+		enabled := d.Get(fmt.Sprintf("feature_%s", name)).(bool)
+
+		if name == "fuse" {
+			featureInput.SetFuse(enabled)
+		} else if name == "kvm" {
+			featureInput.SetKvm(enabled)
+		} else if name == "lxc" {
+			featureInput.SetLxc(enabled)
+		} else if name == "ppp" {
+			featureInput.SetPpp(enabled)
+		} else if name == "tun" {
+			featureInput.SetTun(enabled)
+		}
+	}
+
+	featureResp, err := featureSet.Call()
+	if err != nil {
+		return err
+	} else if !featureResp.Status {
+		return fmt.Errorf("VPS feature set failed: %s", featureResp.Message)
+	}
+
+	if err := waitForOperation(featureResp); err != nil {
+		return fmt.Errorf("VPS feature set failed: %v", err)
+	}
+
+	// SSH keys
 	if keys, ok := d.GetOk("ssh_keys"); ok {
 		if err := deploySshKeys(api, resp.Output.Id, keys.(*schema.Set).List()); err != nil {
 			return err
@@ -238,7 +302,6 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 
 	// Dataset cannot be prefetched, API limitation
 	ds, err := datasetShow(api, int(vps.Dataset.Id))
-
 	if err != nil {
 		return err
 	}
@@ -246,6 +309,11 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	publicIpv4 := getPrimaryPublicHostIpv4Address(api, vps.Id)
 	privateIpv4 := getPrimaryPrivateHostIpv4Address(api, vps.Id)
 	publicIpv6 := getPrimaryPublicHostIpv6Address(api, vps.Id)
+
+	features, err := vpsFeatureList(api, id)
+	if err != nil {
+		return err
+	}
 
 	d.Set("location", vps.Node.Location.Label)
 	d.Set("node", vps.Node.DomainName)
@@ -269,6 +337,12 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 		})
 	} else {
 		log.Printf("[INFO] No connection host found")
+	}
+
+	for _, feature := range features {
+		if isSupportedVpsFeature(feature.Name) {
+			d.Set(fmt.Sprintf("feature_%s", feature.Name), feature.Enabled)
+		}
 	}
 
 	return nil
@@ -346,6 +420,39 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 	}
 
+	if hasAnyVpsFeatureChange(d) {
+		featureSet := api.Vps.Feature.UpdateAll.Prepare()
+		featureSet.SetPathParamInt("vps_id", int64(id))
+		featureInput := featureSet.NewInput()
+
+		for _, name := range supportedVpsFeatures {
+			enabled := d.Get(fmt.Sprintf("feature_%s", name)).(bool)
+
+			if name == "fuse" {
+				featureInput.SetFuse(enabled)
+			} else if name == "kvm" {
+				featureInput.SetKvm(enabled)
+			} else if name == "lxc" {
+				featureInput.SetLxc(enabled)
+			} else if name == "ppp" {
+				featureInput.SetPpp(enabled)
+			} else if name == "tun" {
+				featureInput.SetTun(enabled)
+			}
+		}
+
+		featureResp, err := featureSet.Call()
+		if err != nil {
+			return err
+		} else if !featureResp.Status {
+			return fmt.Errorf("VPS feature set failed: %s", featureResp.Message)
+		}
+
+		if err := waitForOperation(featureResp); err != nil {
+			return fmt.Errorf("VPS feature set failed: %v", err)
+		}
+	}
+
 	if d.HasChange("ssh_keys") {
 		if err := deploySshKeys(api, int64(id), d.Get("ssh_keys").(*schema.Set).List()); err != nil {
 			return err
@@ -397,6 +504,16 @@ func resourceVpsImport(d *schema.ResourceData, m interface{}) ([]*schema.Resourc
 	results[0] = d
 
 	return results, nil
+}
+
+func hasAnyVpsFeatureChange(d *schema.ResourceData) bool {
+	for _, name := range supportedVpsFeatures {
+		if d.HasChange(fmt.Sprintf("feature_%s", name)) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func deploySshKeys(api *client.Client, vpsId int64, sshKeys []interface{}) error {

@@ -71,6 +71,31 @@ func dataSourceVps() *schema.Resource {
 				Description: "Primary public IPv6 address",
 				Computed:    true,
 			},
+			"feature_fuse": {
+				Type: schema.TypeBool,
+				Description: "Allow access to FUSE filesystems",
+				Computed: true,
+			},
+			"feature_kvm": {
+				Type: schema.TypeBool,
+				Description: "Allow access to /dev/kvm for hardware virtualization",
+				Computed: true,
+			},
+			"feature_lxc": {
+				Type: schema.TypeBool,
+				Description: "Enable support for LXC/LXD containers",
+				Computed: true,
+			},
+			"feature_ppp": {
+				Type: schema.TypeBool,
+				Description: "Allow access to /dev/ppp",
+				Computed: true,
+			},
+			"feature_tun": {
+				Type: schema.TypeBool,
+				Description: "Allow access to /dev/net/tun, e.g. for VPNs",
+				Computed: true,
+			},
 		},
 	}
 }
@@ -91,6 +116,11 @@ func dataSourceVpsRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
+	features, err := vpsFeatureList(api, id)
+	if err != nil {
+		return err
+	}
+
 	d.SetId(strconv.Itoa(id))
 	d.Set("location", vps.Node.Location.Label)
 	d.Set("node", vps.Node.DomainName)
@@ -103,6 +133,12 @@ func dataSourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("public_ipv4_address", getPrimaryPublicHostIpv4Address(api, vps.Id))
 	d.Set("private_ipv4_address", getPrimaryPrivateHostIpv4Address(api, vps.Id))
 	d.Set("public_ipv6_address", getPrimaryPublicHostIpv6Address(api, vps.Id))
+
+	for _, feature := range features {
+		if isSupportedVpsFeature(feature.Name) {
+			d.Set(fmt.Sprintf("feature_%s", feature.Name), feature.Enabled)
+		}
+	}
 
 	return nil
 }
