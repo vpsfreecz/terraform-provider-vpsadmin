@@ -3,6 +3,7 @@ package vpsadmin
 import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/vpsfreecz/vpsadmin-go-client/client"
 	"log"
 	"strconv"
 )
@@ -81,6 +82,63 @@ func resourceDataset() *schema.Resource {
 				Description: "Sync mode",
 				Computed:    true,
 			},
+			"export_dataset": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Export dataset over NFS",
+				Default:     false,
+				Optional:    true,
+			},
+			"export_id": &schema.Schema{
+				Type:        schema.TypeInt,
+				Description: "Export ID",
+				Computed:    true,
+			},
+			"export_enable": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Enable the NFS server",
+				Default:     true,
+				Optional:    true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return !d.Get("export_dataset").(bool)
+				},
+			},
+			"export_root_squash": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Enable root squash on the export",
+				Default:     false,
+				Optional:    true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return !d.Get("export_dataset").(bool)
+				},
+			},
+			"export_read_write": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Read-write access by default",
+				Default:     true,
+				Optional:    true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return !d.Get("export_dataset").(bool)
+				},
+			},
+			"export_sync": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Server will reply only after changes were committed",
+				Default:     true,
+				Optional:    true,
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return !d.Get("export_dataset").(bool)
+				},
+			},
+			"export_ip_address": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "IP address of the NFS server",
+				Computed:    true,
+			},
+			"export_path": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "Path to mount from the NFS server",
+				Computed:    true,
+			},
 		},
 	}
 }
@@ -115,6 +173,12 @@ func resourceDatasetCreate(d *schema.ResourceData, m interface{}) error {
 
 	d.SetId(strconv.FormatInt(resp.Output.Id, 10))
 
+	if d.Get("export_dataset").(bool) {
+		if err := createDatasetExport(api, resp.Output.Id, d); err != nil {
+			return err
+		}
+	}
+
 	return resourceDatasetRead(d, m)
 }
 
@@ -143,6 +207,20 @@ func resourceDatasetRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("atime", ds.Atime)
 	d.Set("relatime", ds.Relatime)
 	d.Set("sync", ds.Sync)
+
+	if ds.Export != nil {
+		d.Set("export_dataset", true)
+		d.Set("export_id", ds.Export.Id)
+		d.Set("export_enable", ds.Export.Enabled)
+		d.Set("export_root_squash", ds.Export.RootSquash)
+		d.Set("export_read_write", ds.Export.Rw)
+		d.Set("export_sync", ds.Export.Sync)
+		d.Set("export_ip_address", ds.Export.HostIpAddress.Addr)
+		d.Set("export_path", ds.Export.Path)
+	} else {
+		d.Set("export_dataset", false)
+		d.Set("export_id", nil)
+	}
 
 	return nil
 }
@@ -182,6 +260,38 @@ func resourceDatasetUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 	}
 
+	if d.HasChange("export_dataset") {
+		ds, err := datasetShow(api, id)
+		if err != nil {
+			return err
+		}
+
+		new_export := d.Get("export_dataset").(bool)
+
+		if new_export && ds.Export == nil {
+			if err := createDatasetExport(api, ds.Id, d); err != nil {
+				return err
+			}
+		} else if !new_export && ds.Export != nil {
+			if err := deleteDatasetExport(api, ds.Export.Id); err != nil {
+				return err
+			}
+		}
+	} else {
+		if d.HasChanges("export_enable", "export_root_squash", "export_read_write", "export_sync") {
+			ds, err := datasetShow(api, id)
+			if err != nil {
+				return err
+			}
+
+			if ds.Export != nil {
+				if err := updateDatasetExport(api, ds.Export.Id, d); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
 	return resourceDatasetRead(d, m)
 }
 
@@ -191,6 +301,19 @@ func resourceDatasetDelete(d *schema.ResourceData, m interface{}) error {
 	id, err := strconv.Atoi(d.Id())
 	if err != nil {
 		return fmt.Errorf("Invalid dataset id: %v", err)
+	}
+
+	ds, err := datasetShow(api, id)
+	if err != nil {
+		return err
+	}
+
+	if ds.Export != nil {
+		log.Printf("[INFO] Deleting dataset export: %s", ds.Export.Id)
+
+		if err := deleteDatasetExport(api, ds.Export.Id); err != nil {
+			return err
+		}
 	}
 
 	log.Printf("[INFO] Deleting dataset: %s", d.Id())
@@ -223,4 +346,84 @@ func resourceDatasetImport(d *schema.ResourceData, m interface{}) ([]*schema.Res
 	results[0] = d
 
 	return results, nil
+}
+
+func createDatasetExport(api *client.Client, datasetId int64, d *schema.ResourceData) error {
+	create := api.Export.Create.Prepare()
+
+	input := create.NewInput()
+	input.SetDataset(datasetId)
+	input.SetEnabled(d.Get("export_enable").(bool))
+	input.SetRootSquash(d.Get("export_root_squash").(bool))
+	input.SetRw(d.Get("export_read_write").(bool))
+	input.SetSync(d.Get("export_sync").(bool))
+
+	resp, err := create.Call()
+
+	if err != nil {
+		return err
+	} else if !resp.Status {
+		return fmt.Errorf("Export creation failed: %s", resp.Message)
+	}
+
+	if err := waitForOperation(resp); err != nil {
+		return fmt.Errorf("Export creation failed: %v", err)
+	}
+
+	return nil
+}
+
+func updateDatasetExport(api *client.Client, id int64, d *schema.ResourceData) error {
+	update := api.Export.Update.Prepare()
+	update.SetPathParamInt("export_id", id)
+
+	input := update.NewInput()
+
+	if d.HasChange("export_enable") {
+		input.SetEnabled(d.Get("export_enable").(bool))
+	}
+
+	if d.HasChange("export_root_squashfs") {
+		input.SetRootSquash(d.Get("export_root_squash").(bool))
+	}
+
+	if d.HasChange("export_read_write") {
+		input.SetRw(d.Get("export_read_write").(bool))
+	}
+
+	if d.HasChange("export_sync") {
+		input.SetSync(d.Get("export_sync").(bool))
+	}
+
+	resp, err := update.Call()
+
+	if err != nil {
+		return err
+	} else if !resp.Status {
+		return fmt.Errorf("Export update failed: %s", resp.Message)
+	}
+
+	if err := waitForOperation(resp); err != nil {
+		return fmt.Errorf("Export update failed: %v", err)
+	}
+
+	return nil
+}
+
+func deleteDatasetExport(api *client.Client, id int64) error {
+	del := api.Export.Delete.Prepare()
+	del.SetPathParamInt("export_id", id)
+
+	resp, err := del.Call()
+	if err != nil {
+		return err
+	} else if !resp.Status {
+		return fmt.Errorf("Export deletion failed: %s", resp.Message)
+	}
+
+	if err := waitForOperation(resp); err != nil {
+		return fmt.Errorf("Export deletion failed: %v", err)
+	}
+
+	return nil
 }
