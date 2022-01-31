@@ -337,8 +337,24 @@ func resourceDatasetDelete(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceDatasetImport(d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	err := resourceDatasetRead(d, m)
+	api := m.(*Config).getClient()
+
+	find := api.Dataset.FindByName.Prepare()
+
+	input := find.NewInput()
+	input.SetName(d.Id())
+
+	resp, err := find.Call()
 	if err != nil {
+		return nil, err
+	} else if !resp.Status {
+		return nil, fmt.Errorf("Dataset not found: %s", resp.Message)
+	}
+
+	d.Set("name", d.Id())
+	d.SetId(strconv.FormatInt(resp.Output.Id, 10))
+
+	if err := resourceDatasetRead(d, m); err != nil {
 		return nil, fmt.Errorf("invalid dataset id: %v", err)
 	}
 

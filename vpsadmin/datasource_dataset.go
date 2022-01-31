@@ -11,15 +11,10 @@ func dataSourceDataset() *schema.Resource {
 		Read: dataSourceDatasetRead,
 
 		Schema: map[string]*schema.Schema{
-			"dataset_id": &schema.Schema{
-				Type:        schema.TypeInt,
-				Description: "Dataset ID",
-				Required:    true,
-			},
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "Dataset name",
-				Computed:    true,
+				Required:    true,
 			},
 			"full_name": &schema.Schema{
 				Type:        schema.TypeString,
@@ -122,15 +117,22 @@ func dataSourceDataset() *schema.Resource {
 
 func dataSourceDatasetRead(d *schema.ResourceData, m interface{}) error {
 	api := m.(*Config).getClient()
-	id := d.Get("dataset_id").(int)
-	ds, err := datasetShow(api, id)
 
+	find := api.Dataset.FindByName.Prepare()
+
+	input := find.NewInput()
+	input.SetName(d.Get("name").(string))
+
+	resp, err := find.Call()
 	if err != nil {
-		return fmt.Errorf("Invalid dataset ID: %v", err)
+		return err
+	} else if !resp.Status {
+		return fmt.Errorf("Dataset not found: %s", resp.Message)
 	}
 
-	d.SetId(strconv.Itoa(id))
-	d.Set("name", ds.Name)
+	ds := resp.Output
+
+	d.SetId(strconv.Itoa(int(ds.Id)))
 	d.Set("full_name", ds.Name)
 	d.Set("used", ds.Used)
 	d.Set("referenced", ds.Referenced)
