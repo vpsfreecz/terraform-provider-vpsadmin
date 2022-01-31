@@ -26,7 +26,7 @@ resource "vpsadmin_vps" "my-vps" {
   # Possible values
   #   - using vpsfree-client: vpsfreectl os_template list -o name
   #   - using curl: curl https://api.vpsfree.cz/os_templates
-  os_template = "ubuntu-20.04-x86_64-vpsadminos-minimal"
+  install_os_template = "ubuntu-20.04-x86_64-vpsadminos-minimal"
 
   # vpsAdmin-managed hostname
   hostname = "my-vps"

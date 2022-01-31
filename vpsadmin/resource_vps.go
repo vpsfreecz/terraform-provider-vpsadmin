@@ -1,6 +1,7 @@
 package vpsadmin
 
 import (
+	"context"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -11,6 +12,14 @@ import (
 
 func resourceVps() *schema.Resource {
 	return &schema.Resource{
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    resourceVpsSchemaV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceVpsUpgradeV0,
+				Version: 0,
+			},
+		},
 		Create: resourceVpsCreate,
 		Read:   resourceVpsRead,
 		Update: resourceVpsUpdate,
@@ -31,11 +40,17 @@ func resourceVps() *schema.Resource {
 				Description: "Read-only node name",
 				Computed:    true,
 			},
-			"os_template": &schema.Schema{
+			"install_os_template": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "OS template to base this VPS on",
+				Description: "OS template which is installed to the VPS",
 				Required:    true,
 				ForceNew:    true,
+			},
+			"installed_os_template": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "OS template which corresponds to the VPS at the moment",
+				Computed:    true,
+				Optional:    true,
 			},
 			"hostname": &schema.Schema{
 				Type:          schema.TypeString,
@@ -177,8 +192,7 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	templateId, err := getOsTemplateIdByName(api, d.Get("os_template").(string))
-
+	templateId, err := getOsTemplateIdByName(api, d.Get("install_os_template").(string))
 	if err != nil {
 		return err
 	}
@@ -317,7 +331,7 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 
 	d.Set("location", vps.Node.Location.Label)
 	d.Set("node", vps.Node.DomainName)
-	d.Set("os_template", vps.OsTemplate.Name)
+	d.Set("installed_os_template", vps.OsTemplate.Name)
 	d.Set("hostname", vps.Hostname)
 	d.Set("real_hostname", vps.Hostname)
 	d.Set("manage_hostname", vps.ManageHostname)
@@ -363,6 +377,14 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 	vpsUpdate.SetPathParamInt("vps_id", int64(id))
 
 	input := vpsUpdate.NewInput()
+
+	if d.HasChange("installed_os_template") {
+		templateId, err := getOsTemplateIdByName(api, d.Get("installed_os_template").(string))
+		if err != nil {
+			return err
+		}
+		input.SetOsTemplate(templateId)
+	}
 
 	if d.HasChange("hostname") {
 		input.SetHostname(d.Get("hostname").(string))
@@ -500,10 +522,20 @@ func resourceVpsImport(d *schema.ResourceData, m interface{}) ([]*schema.Resourc
 		return nil, fmt.Errorf("invalid VPS id: %v", err)
 	}
 
+	d.Set("install_os_template", d.Get("installed_os_template"))
+
 	results := make([]*schema.ResourceData, 1)
 	results[0] = d
 
 	return results, nil
+}
+
+func resourceVpsUpgradeV0(ctx context.Context,
+	rawState map[string]interface{},
+	m interface{}) (map[string]interface{}, error) {
+	rawState["install_os_template"] = rawState["os_template"]
+	delete(rawState, "os_template")
+	return rawState, nil
 }
 
 func hasAnyVpsFeatureChange(d *schema.ResourceData) bool {
