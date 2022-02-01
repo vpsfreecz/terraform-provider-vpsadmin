@@ -36,6 +36,11 @@ func dataSourceVps() *schema.Resource {
 				Description: "VPS hostname managed by vpsAdmin",
 				Computed:    true,
 			},
+			"dns_resolver": &schema.Schema{
+				Type:        schema.TypeString,
+				Description: "DNS resolver used by the VPS",
+				Computed:    true,
+			},
 			"cpu": &schema.Schema{
 				Type:        schema.TypeInt,
 				Description: "Number of CPU cores",

@@ -74,6 +74,20 @@ func resourceVps() *schema.Resource {
 				Optional:      true,
 				ConflictsWith: []string{"hostname"},
 			},
+			"dns_resolver": &schema.Schema{
+				Type:          schema.TypeString,
+				Description:   "DNS resolver used by the VPS if managed by vpsAdmin",
+				Computed:      true,
+				Optional:      true,
+				ConflictsWith: []string{"manage_dns_resolver"},
+			},
+			"manage_dns_resolver": &schema.Schema{
+				Type:          schema.TypeBool,
+				Description:   "Manage DNS resolver by vpsAdmin if true, manually if false",
+				Default:       true,
+				Optional:      true,
+				ConflictsWith: []string{"dns_resolver"},
+			},
 			"cpu": &schema.Schema{
 				Type:        schema.TypeInt,
 				Description: "Number of CPU cores",
@@ -198,6 +212,7 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	manageHostname := d.Get("manage_hostname").(bool)
+	manageResolver := d.Get("manage_dns_resolver").(bool)
 
 	create := api.Vps.Create.Prepare()
 
@@ -209,6 +224,17 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 		input.SetHostname(d.Get("hostname").(string))
 	} else {
 		input.SetHostname("vps")
+	}
+
+	if manageResolver {
+		if v, ok := d.GetOk("dns_resolver"); ok {
+			resolverId, err := getDnsResolverIdByLabel(api, v.(string))
+			if err != nil {
+				return err
+			}
+
+			input.SetDnsResolver(resolverId)
+		}
 	}
 
 	input.SetCpu(int64(d.Get("cpu").(int)))
@@ -335,6 +361,14 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("hostname", vps.Hostname)
 	d.Set("real_hostname", vps.Hostname)
 	d.Set("manage_hostname", vps.ManageHostname)
+
+	if vps.DnsResolver != nil {
+		d.Set("dns_resolver", vps.DnsResolver.Label)
+	} else {
+		d.Set("dns_resolver", nil)
+	}
+
+	d.Set("manage_dns_resolver", vps.DnsResolver != nil)
 	d.Set("cpu", vps.Cpu)
 	d.Set("memory", vps.Memory)
 	d.Set("swap", vps.Swap)
@@ -392,6 +426,20 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChange("manage_hostname") {
 		input.SetManageHostname(d.Get("manage_hostname").(bool))
+	}
+
+	if d.HasChanges("dns_resolver", "manage_dns_resolver") {
+		manageResolver := d.Get("manage_dns_resolver").(bool)
+
+		if manageResolver {
+			resolverId, err := getDnsResolverIdByLabel(api, d.Get("dns_resolver").(string))
+			if err != nil {
+				return err
+			}
+			input.SetDnsResolver(resolverId)
+		} else {
+			input.SetDnsResolverNil(true)
+		}
 	}
 
 	if d.HasChange("cpu") {

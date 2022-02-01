@@ -11,7 +11,7 @@ func vpsShow(api *client.Client, id int) (*client.ActionVpsShowOutput, error) {
 	show := api.Vps.Show.Prepare()
 	show.SetPathParamInt("vps_id", int64(id))
 	show.SetMetaInput(&client.ActionVpsShowMetaGlobalInput{
-		Includes: "node__location,os_template",
+		Includes: "node__location,os_template,dns_resolver",
 	})
 	show.MetaInput.SelectParameters("Includes")
 
