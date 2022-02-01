@@ -4,7 +4,7 @@ let
   get-token = pkgs.buildGoModule {
     name = "get-token";
     src = ../get-token;
-    modSha256 = "sha256:067vdgs0wfk1s8ybvg8swdc2il6wlvsf8w1xgiakcnp0rplbkx0g";
+    vendorSha256 = "sha256:0dpjll0qhkgq6yidz2p7451l35z92c60a2dggk2vq7x54w0ksi3l";
   };
 
 in stdenv.mkDerivation rec {
