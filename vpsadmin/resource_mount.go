@@ -17,6 +17,8 @@ func resourceMount() *schema.Resource {
 			State: resourceMountImport,
 		},
 
+		Description: "Mount VPS subdatasets into VPS.",
+
 		Schema: map[string]*schema.Schema{
 			"vps": &schema.Schema{
 				Type:        schema.TypeInt,

@@ -28,6 +28,12 @@ func resourceVps() *schema.Resource {
 			State: resourceVpsImport,
 		},
 
+		Description: `
+Represents a virtual server instance. To create a VPS, you need to have
+a sufficient amount of resources assigned to your account in vpsAdmin. Contact
+support in case you need more.
+`,
+
 		Schema: map[string]*schema.Schema{
 			"location": &schema.Schema{
 				Type:        schema.TypeString,

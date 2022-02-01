@@ -18,6 +18,16 @@ func resourceDataset() *schema.Resource {
 			State: resourceDatasetImport,
 		},
 
+		Description: `
+Represents a ZFS dataset, either on NAS (Network-Attached Storage) or a VPS
+subdataset.
+
+NAS datasets can have *quota*, whereas VPS subdatasets use *refquota*
+attribute. NAS datasets can be exported over NFS using *export_dataset*
+and then mounted inside the container. VPS subdatasets are mounted using
+the *vpsadmin_mount* resource.
+`,
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:        schema.TypeString,
