@@ -19,12 +19,13 @@ description: |-
 
 - **cpu** (Number) Number of CPU cores
 - **diskspace** (Number) Root dataset's size in MB
+- **install_os_template** (String) OS template which is installed to the VPS
 - **location** (String) Location label
 - **memory** (Number) Available memory in MB
-- **os_template** (String) OS template to base this VPS on
 
 ### Optional
 
+- **dns_resolver** (String) DNS resolver used by the VPS if managed by vpsAdmin
 - **feature_fuse** (Boolean) Allow access to FUSE filesystems
 - **feature_kvm** (Boolean) Allow access to /dev/kvm for hardware virtualization
 - **feature_lxc** (Boolean) Enable support for LXC/LXD containers
@@ -32,6 +33,8 @@ description: |-
 - **feature_tun** (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
 - **hostname** (String) VPS hostname managed by vpsAdmin
 - **id** (String) The ID of this resource.
+- **installed_os_template** (String) OS template which corresponds to the VPS at the moment
+- **manage_dns_resolver** (Boolean) Manage DNS resolver by vpsAdmin if true, manually if false
 - **manage_hostname** (Boolean) Manage hostname by vpsAdmin if true, manually if false
 - **private_ipv4_count** (Number) Number of private IPv4 addresses to add when the VPS is created
 - **public_ipv4_count** (Number) Number of public IPv4 addresses to add when the VPS is created

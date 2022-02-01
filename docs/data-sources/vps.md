@@ -27,6 +27,7 @@ description: |-
 
 - **cpu** (Number) Number of CPU cores
 - **diskspace** (Number) Root dataset's size in MB
+- **dns_resolver** (String) DNS resolver used by the VPS
 - **feature_fuse** (Boolean) Allow access to FUSE filesystems
 - **feature_kvm** (Boolean) Allow access to /dev/kvm for hardware virtualization
 - **feature_lxc** (Boolean) Enable support for LXC/LXD containers
@@ -34,6 +35,7 @@ description: |-
 - **feature_tun** (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
 - **hostname** (String) VPS hostname managed by vpsAdmin
 - **location** (String) Location label
+- **manage_hostname** (Boolean) Hostname managed by vpsAdmin if true
 - **memory** (Number) Available memory in MB
 - **node** (String) Read-only node name
 - **os_template** (String) OS template to base this VPS on
