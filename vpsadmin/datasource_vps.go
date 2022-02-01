@@ -36,6 +36,11 @@ func dataSourceVps() *schema.Resource {
 				Description: "VPS hostname managed by vpsAdmin",
 				Computed:    true,
 			},
+			"manage_hostname": &schema.Schema{
+				Type:        schema.TypeBool,
+				Description: "Hostname managed by vpsAdmin if true",
+				Computed:    true,
+			},
 			"dns_resolver": &schema.Schema{
 				Type:        schema.TypeString,
 				Description: "DNS resolver used by the VPS",
@@ -131,6 +136,7 @@ func dataSourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("node", vps.Node.DomainName)
 	d.Set("os_template", vps.OsTemplate.Name)
 	d.Set("hostname", vps.Hostname)
+	d.Set("manage_hostname", vps.ManageHostname)
 	d.Set("cpu", vps.Cpu)
 	d.Set("memory", vps.Memory)
 	d.Set("swap", vps.Swap)
