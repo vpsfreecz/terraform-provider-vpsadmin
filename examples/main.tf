@@ -8,6 +8,7 @@ provider "vpsadmin" {
   auth_token = var.vpsadmin_token
 }
 
+# Declare a public key for connection over SSH
 resource "vpsadmin_ssh_key" "my-key" {
   label = "My public key"
 
@@ -15,6 +16,7 @@ resource "vpsadmin_ssh_key" "my-key" {
   key = file("~/.ssh/my_key.pub")
 }
 
+# Create a VPS
 resource "vpsadmin_vps" "my-vps" {
   # Location label
   # Possible values
@@ -51,6 +53,11 @@ resource "vpsadmin_vps" "my-vps" {
       "export PATH=$PATH:/usr/bin",
       "apt-get update",
       "apt-get -y install nginx",
+
+      # Uncomment to mount dataset nas/backups over NFS
+      # "apt-get -y install nfs-common",
+      # "mkdir -p /mnt/backups",
+      # "mount -t nfs ${vpsadmin_dataset.nas-backups.export_ip_address}:${vpsadmin_dataset.nas-backups.export_path} /mnt/backups",
     ]
 
     connection {
@@ -65,3 +72,10 @@ resource "vpsadmin_vps" "my-vps" {
   }
 }
 
+# Create a dataset on NAS (Network-Attached Storage)
+resource "vpsadmin_dataset" "nas-backups" {
+  name = "nas/backups"
+
+  # Export the dataset over NFS
+  export_dataset = true
+}
