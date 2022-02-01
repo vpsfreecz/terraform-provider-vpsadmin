@@ -77,6 +77,7 @@ resource "vpsadmin_vps" "my-vps" {
 - **public_ipv4_count** (Number) Number of public IPv4 addresses to add when the VPS is created
 - **public_ipv6_count** (Number) Number of public IPv6 addresses to add when the VPS is created
 - **ssh_keys** (Set of String) List of SSH key IDs to append to /root/.ssh_authorized_keys
+- **start_menu_timeout** (Number) Start menu timeout before the VPS is started, in seconds
 - **swap** (Number) Available swap in MB
 
 ### Read-Only

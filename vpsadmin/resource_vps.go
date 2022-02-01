@@ -199,6 +199,12 @@ support in case you need more.
 				Default:     true,
 				Optional:    true,
 			},
+			"start_menu_timeout": {
+				Type:        schema.TypeInt,
+				Description: "Start menu timeout before the VPS is started, in seconds",
+				Computed:    true,
+				Optional:    true,
+			},
 		},
 	}
 }
@@ -250,6 +256,10 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	input.SetIpv4(int64(d.Get("public_ipv4_count").(int)))
 	input.SetIpv4Private(int64(d.Get("private_ipv4_count").(int)))
 	input.SetIpv6(int64(d.Get("public_ipv6_count").(int)))
+
+	if v, ok := d.GetOk("start_menu_timeout"); ok {
+		input.SetStartMenuTimeout(int64(v.(int)))
+	}
 
 	log.Printf("[DEBUG] VPS create configuration: %#v", create.Input)
 
@@ -399,6 +409,8 @@ func resourceVpsRead(d *schema.ResourceData, m interface{}) error {
 		}
 	}
 
+	d.Set("start_menu_timeout", vps.StartMenuTimeout)
+
 	return nil
 }
 
@@ -458,6 +470,10 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChange("swap") {
 		input.SetSwap(int64(d.Get("swap").(int)))
+	}
+
+	if d.HasChange("start_menu_timeout") {
+		input.SetStartMenuTimeout(int64(d.Get("start_menu_timeout").(int)))
 	}
 
 	if input.AnySelected() {

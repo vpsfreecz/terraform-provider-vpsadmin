@@ -48,6 +48,7 @@ data "vpsadmin_vps" "my-vps" {
 - **private_ipv4_address** (String) Primary private IPv4 address
 - **public_ipv4_address** (String) Primary public IPv4 address
 - **public_ipv6_address** (String) Primary public IPv6 address
+- **start_menu_timeout** (Number) Start menu timeout before the VPS is started, in seconds
 - **swap** (Number) Available swap in MB
 
 

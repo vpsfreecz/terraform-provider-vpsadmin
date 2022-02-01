@@ -106,6 +106,11 @@ func dataSourceVps() *schema.Resource {
 				Description: "Allow access to /dev/net/tun, e.g. for VPNs",
 				Computed:    true,
 			},
+			"start_menu_timeout": {
+				Type:        schema.TypeInt,
+				Description: "Start menu timeout before the VPS is started, in seconds",
+				Computed:    true,
+			},
 		},
 	}
 }
@@ -150,6 +155,8 @@ func dataSourceVpsRead(d *schema.ResourceData, m interface{}) error {
 			d.Set(fmt.Sprintf("feature_%s", feature.Name), feature.Enabled)
 		}
 	}
+
+	d.Set("start_menu_timeout", vps.StartMenuTimeout)
 
 	return nil
 }
