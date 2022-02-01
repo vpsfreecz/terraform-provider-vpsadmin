@@ -24,3 +24,9 @@ $ terraform init
 $ terraform plan
 $ terraform apply
 ```
+
+In case you have more than one VPS, please apply with `-parallelism=1`:
+
+```
+$ terraform apply -parallelism=1
+```
