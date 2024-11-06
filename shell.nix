@@ -10,6 +10,6 @@ in stdenv.mkDerivation rec {
     gnumake
     go
     gotools
-    terraform
+    opentofu
   ];
 }
