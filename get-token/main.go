@@ -148,6 +148,7 @@ func getToken(opts *options) (string, error) {
 		Password:     opts.password,
 		Lifetime:     opts.lifetime,
 		Interval:     int64(opts.interval),
+		Scope:        "all",
 		TotpCallback: getTotpCode,
 	})
 
