@@ -29,7 +29,7 @@ resource "vpsadmin_dataset" "my-subdataset" {
 
 resource "vpsadmin_mount" "vps-subdataset" {
   vps = vpsadmin_vps.my-vps.id
-  dataset = vpsadmin_dataset.vps-subdataset.id
+  dataset = vpsadmin_dataset.my-subdataset.id
   mountpoint = "/mnt/subdataset"
 }
 ```
