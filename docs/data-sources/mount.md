@@ -17,19 +17,14 @@ description: |-
 
 ### Required
 
-- **mount_id** (Number) Mount ID
-- **vps** (Number) VPS ID
-
-### Optional
-
-- **id** (String) The ID of this resource.
+- `mount_id` (Number) Mount ID
+- `vps` (Number) VPS ID
 
 ### Read-Only
 
-- **dataset** (Number) ID of the mounted dataset
-- **enable** (Boolean) Whether the mount is enabled
-- **mode** (String) Read-write or read-only mode
-- **mountpoint** (String) Mountpoint inside the VPS
-- **on_start_fail** (String) Action for when the mount fails during VPS start
-
-
+- `dataset` (Number) ID of the mounted dataset
+- `enable` (Boolean) Whether the mount is enabled
+- `id` (String) The ID of this resource.
+- `mode` (String) Read-write or read-only mode
+- `mountpoint` (String) Mountpoint inside the VPS
+- `on_start_fail` (String) Action for when the mount fails during VPS start

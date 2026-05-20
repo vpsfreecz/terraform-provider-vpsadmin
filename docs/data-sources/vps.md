@@ -23,32 +23,27 @@ data "vpsadmin_vps" "my-vps" {
 
 ### Required
 
-- **vps_id** (Number) VPS ID
-
-### Optional
-
-- **id** (String) The ID of this resource.
+- `vps_id` (Number) VPS ID
 
 ### Read-Only
 
-- **cpu** (Number) Number of CPU cores
-- **diskspace** (Number) Root dataset's size in MB
-- **dns_resolver** (String) DNS resolver used by the VPS
-- **feature_fuse** (Boolean) Allow access to FUSE filesystems
-- **feature_kvm** (Boolean) Allow access to /dev/kvm for hardware virtualization
-- **feature_lxc** (Boolean) Enable support for LXC/LXD containers
-- **feature_ppp** (Boolean) Allow access to /dev/ppp
-- **feature_tun** (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
-- **hostname** (String) VPS hostname managed by vpsAdmin
-- **location** (String) Location label
-- **manage_hostname** (Boolean) Hostname managed by vpsAdmin if true
-- **memory** (Number) Available memory in MB
-- **node** (String) Read-only node name
-- **os_template** (String) OS template to base this VPS on
-- **private_ipv4_address** (String) Primary private IPv4 address
-- **public_ipv4_address** (String) Primary public IPv4 address
-- **public_ipv6_address** (String) Primary public IPv6 address
-- **start_menu_timeout** (Number) Start menu timeout before the VPS is started, in seconds
-- **swap** (Number) Available swap in MB
-
-
+- `cpu` (Number) Number of CPU cores
+- `diskspace` (Number) Root dataset's size in MB
+- `dns_resolver` (String) DNS resolver used by the VPS
+- `feature_fuse` (Boolean) Allow access to FUSE filesystems
+- `feature_kvm` (Boolean) Allow access to /dev/kvm for hardware virtualization
+- `feature_lxc` (Boolean) Enable support for LXC/LXD containers
+- `feature_ppp` (Boolean) Allow access to /dev/ppp
+- `feature_tun` (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
+- `hostname` (String) VPS hostname managed by vpsAdmin
+- `id` (String) The ID of this resource.
+- `location` (String) Location label
+- `manage_hostname` (Boolean) Hostname managed by vpsAdmin if true
+- `memory` (Number) Available memory in MB
+- `node` (String) Read-only node name
+- `os_template` (String) OS template to base this VPS on
+- `private_ipv4_address` (String) Primary private IPv4 address
+- `public_ipv4_address` (String) Primary public IPv4 address
+- `public_ipv6_address` (String) Primary public IPv6 address
+- `start_menu_timeout` (Number) Start menu timeout before the VPS is started, in seconds
+- `swap` (Number) Available swap in MB

@@ -55,37 +55,39 @@ resource "vpsadmin_dataset" "my-subdataset" {
 
 ### Required
 
-- **name** (String) Dataset name
+- `name` (String) Dataset name
 
 ### Optional
 
-- **export_dataset** (Boolean) Export dataset over NFS
-- **export_enable** (Boolean) Enable the NFS server
-- **export_read_write** (Boolean) Read-write access by default
-- **export_root_squash** (Boolean) Enable root squash on the export
-- **export_sync** (Boolean) Server will reply only after changes were committed
-- **id** (String) The ID of this resource.
-- **quota** (Number) Quota, in MiB
-- **refquota** (Number) Reference quota, in MiB
+- `export_dataset` (Boolean) Export dataset over NFS
+- `export_enable` (Boolean) Enable the NFS server
+- `export_read_write` (Boolean) Read-write access by default
+- `export_root_squash` (Boolean) Enable root squash on the export
+- `export_sync` (Boolean) Server will reply only after changes were committed
+- `quota` (Number) Quota, in MiB
+- `refquota` (Number) Reference quota, in MiB
 
 ### Read-Only
 
-- **atime** (Boolean) Enabled atime
-- **avail** (Number) Available space, in MiB
-- **compression** (Boolean) Compression enabled
-- **export_id** (Number) Export ID
-- **export_ip_address** (String) IP address of the NFS server
-- **export_path** (String) Path to mount from the NFS server
-- **full_name** (String) Full dataset name
-- **recordsize** (Number) Record size, in bytes
-- **referenced** (Number) Referenced space, in MiB
-- **relatime** (Boolean) Enabled relatime
-- **sync** (String) Sync mode
-- **used** (Number) Used space, in MiB
+- `atime` (Boolean) Enabled atime
+- `avail` (Number) Available space, in MiB
+- `compression` (Boolean) Compression enabled
+- `export_id` (Number) Export ID
+- `export_ip_address` (String) IP address of the NFS server
+- `export_path` (String) Path to mount from the NFS server
+- `full_name` (String) Full dataset name
+- `id` (String) The ID of this resource.
+- `recordsize` (Number) Record size, in bytes
+- `referenced` (Number) Referenced space, in MiB
+- `relatime` (Boolean) Enabled relatime
+- `sync` (String) Sync mode
+- `used` (Number) Used space, in MiB
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import vpsadmin_dataset.nas-backups $dataset_name

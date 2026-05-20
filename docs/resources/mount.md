@@ -39,20 +39,25 @@ resource "vpsadmin_mount" "vps-subdataset" {
 
 ### Required
 
-- **dataset** (Number) ID of the mounted dataset
-- **mountpoint** (String) Mountpoint inside the VPS
-- **vps** (Number) VPS ID
+- `dataset` (Number) ID of the mounted dataset
+- `mountpoint` (String) Mountpoint inside the VPS
+- `vps` (Number) VPS ID
 
 ### Optional
 
-- **enable** (Boolean) Whether the mount is enabled
-- **id** (String) The ID of this resource.
-- **mode** (String) Read-write or read-only mode
-- **on_start_fail** (String) Action for when the mount fails during VPS start
+- `enable` (Boolean) Whether the mount is enabled
+- `mode` (String) Read-write or read-only mode
+- `on_start_fail` (String) Action for when the mount fails during VPS start
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # Find mount ID with vpsfree-client:

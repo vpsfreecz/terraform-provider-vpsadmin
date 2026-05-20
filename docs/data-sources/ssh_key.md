@@ -17,17 +17,12 @@ description: |-
 
 ### Required
 
-- **label** (String) Public key label
-
-### Optional
-
-- **id** (String) The ID of this resource.
+- `label` (String) Public key label
 
 ### Read-Only
 
-- **auto_add** (Boolean) Automatically add this key to new VPS
-- **comment** (String) Comment from the public key
-- **fingerprint** (String) Key fingerprint
-- **key** (String) Public key
-
-
+- `auto_add` (Boolean) Automatically add this key to new VPS
+- `comment` (String) Comment from the public key
+- `fingerprint` (String) Key fingerprint
+- `id` (String) The ID of this resource.
+- `key` (String) Public key

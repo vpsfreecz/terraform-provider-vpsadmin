@@ -26,22 +26,24 @@ resource "vpsadmin_ssh_key" "my-key" {
 
 ### Required
 
-- **key** (String) Public key
-- **label** (String) Public key label
+- `key` (String) Public key
+- `label` (String) Public key label
 
 ### Optional
 
-- **auto_add** (Boolean) Automatically add this key to new VPS
-- **id** (String) The ID of this resource.
+- `auto_add` (Boolean) Automatically add this key to new VPS
 
 ### Read-Only
 
-- **comment** (String) Comment from the public key
-- **fingerprint** (String) Key fingerprint
+- `comment` (String) Comment from the public key
+- `fingerprint` (String) Key fingerprint
+- `id` (String) The ID of this resource.
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 # Find SSH key ID with vpsfree-client:

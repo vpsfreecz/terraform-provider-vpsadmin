@@ -54,43 +54,45 @@ resource "vpsadmin_vps" "my-vps" {
 
 ### Required
 
-- **cpu** (Number) Number of CPU cores
-- **diskspace** (Number) Root dataset's size in MB
-- **install_os_template** (String) OS template which is installed to the VPS
-- **location** (String) Location label
-- **memory** (Number) Available memory in MB
+- `cpu` (Number) Number of CPU cores
+- `diskspace` (Number) Root dataset's size in MB
+- `install_os_template` (String) OS template which is installed to the VPS
+- `location` (String) Location label
+- `memory` (Number) Available memory in MB
 
 ### Optional
 
-- **dns_resolver** (String) DNS resolver used by the VPS if managed by vpsAdmin
-- **feature_fuse** (Boolean) Allow access to FUSE filesystems
-- **feature_kvm** (Boolean) Allow access to /dev/kvm for hardware virtualization
-- **feature_lxc** (Boolean) Enable support for LXC/LXD containers
-- **feature_ppp** (Boolean) Allow access to /dev/ppp
-- **feature_tun** (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
-- **hostname** (String) VPS hostname managed by vpsAdmin
-- **id** (String) The ID of this resource.
-- **installed_os_template** (String) OS template which corresponds to the VPS at the moment
-- **manage_dns_resolver** (Boolean) Manage DNS resolver by vpsAdmin if true, manually if false
-- **manage_hostname** (Boolean) Manage hostname by vpsAdmin if true, manually if false
-- **private_ipv4_count** (Number) Number of private IPv4 addresses to add when the VPS is created
-- **public_ipv4_count** (Number) Number of public IPv4 addresses to add when the VPS is created
-- **public_ipv6_count** (Number) Number of public IPv6 addresses to add when the VPS is created
-- **ssh_keys** (Set of String) List of SSH key IDs to append to /root/.ssh_authorized_keys
-- **start_menu_timeout** (Number) Start menu timeout before the VPS is started, in seconds
-- **swap** (Number) Available swap in MB
+- `dns_resolver` (String) DNS resolver used by the VPS if managed by vpsAdmin
+- `feature_fuse` (Boolean) Allow access to FUSE filesystems
+- `feature_kvm` (Boolean) Allow access to /dev/kvm for hardware virtualization
+- `feature_lxc` (Boolean) Enable support for LXC/LXD containers
+- `feature_ppp` (Boolean) Allow access to /dev/ppp
+- `feature_tun` (Boolean) Allow access to /dev/net/tun, e.g. for VPNs
+- `hostname` (String) VPS hostname managed by vpsAdmin
+- `installed_os_template` (String) OS template which corresponds to the VPS at the moment
+- `manage_dns_resolver` (Boolean) Manage DNS resolver by vpsAdmin if true, manually if false
+- `manage_hostname` (Boolean) Manage hostname by vpsAdmin if true, manually if false
+- `private_ipv4_count` (Number) Number of private IPv4 addresses to add when the VPS is created
+- `public_ipv4_count` (Number) Number of public IPv4 addresses to add when the VPS is created
+- `public_ipv6_count` (Number) Number of public IPv6 addresses to add when the VPS is created
+- `ssh_keys` (Set of String) List of SSH key IDs to append to /root/.ssh_authorized_keys
+- `start_menu_timeout` (Number) Start menu timeout before the VPS is started, in seconds
+- `swap` (Number) Available swap in MB
 
 ### Read-Only
 
-- **node** (String) Read-only node name
-- **private_ipv4_address** (String) Primary private IPv4 address
-- **public_ipv4_address** (String) Primary public IPv4 address
-- **public_ipv6_address** (String) Primary public IPv6 address
-- **real_hostname** (String) VPS hostname as reported by the VPS
+- `id` (String) The ID of this resource.
+- `node` (String) Read-only node name
+- `private_ipv4_address` (String) Primary private IPv4 address
+- `public_ipv4_address` (String) Primary public IPv4 address
+- `public_ipv6_address` (String) Primary public IPv6 address
+- `real_hostname` (String) VPS hostname as reported by the VPS
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import vpsadmin_vps.my-vps $vps_id
