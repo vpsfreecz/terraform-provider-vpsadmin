@@ -52,3 +52,11 @@ To compile the provider, run:
 ```sh
 $ make build
 ```
+
+Run local checks with:
+
+```sh
+$ make test
+$ make test-get-token
+$ make test-integration
+```

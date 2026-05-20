@@ -14,8 +14,17 @@ fmt:
 	go fmt
 	cd vpsadmin && go fmt
 
+test:
+	go test ./...
+
+test-get-token:
+	cd get-token && go test ./...
+
+test-integration:
+	./test-runner.sh test -t ci
+
 install:
 	mkdir -p $(PLUGIN_DIR)/$(PROVIDER_DIR)
 	cp -p $(TARGET) $(PLUGIN_DIR)/$(PROVIDER_DIR)/
 
-.PHONY: build docs fmt install
+.PHONY: build docs fmt install test test-get-token test-integration
