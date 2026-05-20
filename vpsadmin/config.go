@@ -53,6 +53,8 @@ func waitForOperation(watcher client.BlockingOperationWatcher) error {
 				}
 			}
 		}
+
+		return fmt.Errorf("Operation timed out")
 	}
 
 	return nil
