@@ -1,15 +1,13 @@
 module github.com/vpsfreecz/terraform-provider-vpsadmin/get-token
 
-go 1.23.0
-
-toolchain go1.23.7
+go 1.26.3
 
 require (
-	github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20250513113348-b1fdcb3c20a6
-	golang.org/x/crypto v0.38.0
+	github.com/vpsfreecz/vpsadmin-go-client v0.0.0-20260504133612-45a5170b7190
+	golang.org/x/crypto v0.51.0
 )
 
 require (
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/term v0.32.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/term v0.43.0 // indirect
 )
