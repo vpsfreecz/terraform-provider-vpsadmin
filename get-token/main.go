@@ -161,7 +161,7 @@ func getToken(opts *options) (string, error) {
 
 func writeToken(token string, opts *options) error {
 	if opts.tfvars == "" {
-		fmt.Printf(token)
+		fmt.Print(token)
 		return nil
 	}
 
