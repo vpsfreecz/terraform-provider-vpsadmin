@@ -19,17 +19,11 @@ func resourceVpsSchemaV0() *schema.Resource {
 				Description: "Read-only node name",
 				Computed:    true,
 			},
-			"install_os_template": &schema.Schema{
+			"os_template": &schema.Schema{
 				Type:        schema.TypeString,
-				Description: "OS template which is installed to the VPS",
+				Description: "OS template to base this VPS on",
 				Required:    true,
 				ForceNew:    true,
-			},
-			"use_os_template": &schema.Schema{
-				Type:        schema.TypeString,
-				Description: "OS template which corresponds to the VPS at the moment",
-				Computed:    true,
-				Optional:    true,
 			},
 			"hostname": &schema.Schema{
 				Type:          schema.TypeString,
