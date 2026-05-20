@@ -409,7 +409,7 @@ func updateDatasetExport(api *client.Client, id int64, d *schema.ResourceData) e
 		input.SetEnabled(d.Get("export_enable").(bool))
 	}
 
-	if d.HasChange("export_root_squashfs") {
+	if d.HasChange("export_root_squash") {
 		input.SetRootSquash(d.Get("export_root_squash").(bool))
 	}
 
