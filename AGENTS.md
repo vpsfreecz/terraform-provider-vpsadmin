@@ -27,6 +27,8 @@ Add focused Go tests next to the code they cover using standard `*_test.go` nami
 
 Recent commits use short, imperative messages, often scoped with a prefix such as `examples:` or `get-token:`. Keep the first line concise, for example `examples: use opentofu` or `get-token: update dependencies`. Pull requests should describe the behavior change, note any generated docs updates, list test commands run, and link related issues when available.
 
+Every commit must be created from a temporary message file, not with `git commit -m`. Each commit message must explain what changed and why, including the problem and the solution. No commit message line may exceed 80 characters; validate the temporary file line lengths before committing with `git commit -F "$msgfile"`.
+
 ## Security & Configuration Tips
 
 Do not commit API tokens, `.tfvars` files, Terraform state, crash logs, or local `.terraform/` directories. Prefer `VPSADMIN_API_TOKEN` and `VPSADMIN_API_URL` for local testing. When running example applies against real infrastructure, review plans carefully and use `-parallelism=1` when managing multiple VPS instances.
