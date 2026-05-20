@@ -142,6 +142,11 @@ func dataSourceVpsRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("os_template", vps.OsTemplate.Name)
 	d.Set("hostname", vps.Hostname)
 	d.Set("manage_hostname", vps.ManageHostname)
+	if vps.DnsResolver != nil {
+		d.Set("dns_resolver", vps.DnsResolver.Label)
+	} else {
+		d.Set("dns_resolver", nil)
+	}
 	d.Set("cpu", vps.Cpu)
 	d.Set("memory", vps.Memory)
 	d.Set("swap", vps.Swap)
