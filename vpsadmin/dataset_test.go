@@ -10,30 +10,40 @@ import (
 
 func TestDataSourceDatasetReadMapsExportFields(t *testing.T) {
 	cfg := newTestConfig(t, func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v7.0/datasets/find_by_name" {
+		switch r.URL.Path {
+		case "/v7.0/datasets/find_by_name":
+			if got := r.URL.Query().Get("dataset[name]"); got != "tank/app" {
+				t.Errorf("dataset[name] = %q", got)
+			}
+
+			writeAPIResponse(t, w, "dataset", &client.ActionDatasetFindByNameOutput{
+				Id:   77,
+				Name: "tank/app",
+			})
+		case "/v7.0/datasets/77":
+			writeAPIResponse(t, w, "dataset", &client.ActionDatasetShowOutput{
+				Id:          77,
+				Name:        "tank/app",
+				Used:        10,
+				Referenced:  20,
+				Avail:       30,
+				Quota:       40,
+				Refquota:    50,
+				Compression: true,
+				Recordsize:  131072,
+				Atime:       false,
+				Relatime:    true,
+				Sync:        "standard",
+				Export:      &client.ActionExportShowOutput{Id: 88},
+			})
+		case "/v7.0/exports/88":
+			if got := r.URL.Query().Get("_meta[includes]"); got != "host_ip_address" {
+				t.Errorf("includes query = %q", got)
+			}
+			writeAPIResponse(t, w, "export", testExport(88))
+		default:
 			http.NotFound(w, r)
-			return
 		}
-
-		if got := r.URL.Query().Get("dataset[name]"); got != "tank/app" {
-			t.Errorf("dataset[name] = %q", got)
-		}
-
-		writeAPIResponse(t, w, "dataset", &client.ActionDatasetFindByNameOutput{
-			Id:          77,
-			Name:        "tank/app",
-			Used:        10,
-			Referenced:  20,
-			Avail:       30,
-			Quota:       40,
-			Refquota:    50,
-			Compression: true,
-			Recordsize:  131072,
-			Atime:       false,
-			Relatime:    true,
-			Sync:        "standard",
-			Export:      testExport(88),
-		})
 	})
 
 	d := schema.TestResourceDataRaw(t, dataSourceDataset().Schema, map[string]interface{}{

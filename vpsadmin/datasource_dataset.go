@@ -130,7 +130,11 @@ func dataSourceDatasetRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Dataset not found: %s", resp.Message)
 	}
 
-	ds := resp.Output
+	found := resp.Output
+	ds, err := datasetShow(api, int(found.Id))
+	if err != nil {
+		return err
+	}
 
 	d.SetId(strconv.Itoa(int(ds.Id)))
 	d.Set("full_name", ds.Name)

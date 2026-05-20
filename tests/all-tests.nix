@@ -32,5 +32,5 @@ let
   };
 in
 testLib.makeTests [
-  "provider/basic"
+  "workflows"
 ]

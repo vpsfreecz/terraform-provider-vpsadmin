@@ -117,6 +117,16 @@ class Vpsadminctl
 end
 
 class VpsadminServicesMachine < OsVm::NixosMachine
+  CHAIN_STATES = {
+    staged: 0,
+    queued: 1,
+    done: 2,
+    rollbacking: 3,
+    failed: 4,
+    fatal: 5,
+    resolved: 6
+  }.freeze
+
   attr_reader :vpsadminctl
 
   def initialize(...)
@@ -169,11 +179,68 @@ class VpsadminServicesMachine < OsVm::NixosMachine
     JSON.parse(output.to_s.lines.last)
   end
 
+  def mariadb_raw(sql:, database: 'vpsadmin', user: 'api', timeout: nil)
+    cmd = mariadb_command(sql:, database:, user:)
+    timeout ? succeeds(cmd, timeout:) : succeeds(cmd)
+  end
+
+  def mariadb_scalar(sql:, database: 'vpsadmin', user: 'api', timeout: nil)
+    _, output = mariadb_raw(sql:, database:, user:, timeout:)
+    output.to_s.lines.first&.strip
+  end
+
+  def wait_for_chain_state(chain_id, state:, timeout: @default_timeout || 300)
+    expected = state.is_a?(Symbol) ? CHAIN_STATES.fetch(state) : Integer(state)
+
+    wait_for_condition(
+      timeout:,
+      error_message: "Timed out waiting for chain ##{chain_id} state=#{state}"
+    ) do
+      current = mariadb_scalar(
+        sql: "SELECT state FROM transaction_chains WHERE id = #{Integer(chain_id)}"
+      )
+
+      current && current.to_i == expected
+    end
+  end
+
   def unlock_transaction_signing_key(passphrase: 'test')
     vpsadminctl.succeeds(
       args: %w[api_server unlock_transaction_signing_key],
       parameters: { passphrase: }
     )
+  end
+
+  private
+
+  def mariadb_command(sql:, database:, user:)
+    password_file = "/etc/vpsadmin-test/mariadb-#{user}-password"
+
+    inner = [
+      'mariadb',
+      '--batch',
+      '--raw',
+      '--skip-column-names',
+      "--user=#{Shellwords.escape(user)}",
+      "--password=\"$(cat #{Shellwords.escape(password_file)})\"",
+      Shellwords.escape(database),
+      '-e',
+      Shellwords.escape(sql)
+    ].join(' ')
+
+    "bash -lc #{Shellwords.escape(inner)}"
+  end
+
+  def wait_for_condition(timeout:, error_message:)
+    deadline = Time.now + timeout
+
+    loop do
+      return true if yield
+
+      raise OsVm::TimeoutError, error_message if Time.now >= deadline
+
+      sleep 1
+    end
   end
 end
 
