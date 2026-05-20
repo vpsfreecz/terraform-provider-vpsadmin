@@ -249,11 +249,11 @@ func resourceDatasetUpdate(d *schema.ResourceData, m interface{}) error {
 	input := dsUpdate.NewInput()
 
 	if d.HasChange("quota") {
-		input.SetQuota(d.Get("quota").(int64))
+		input.SetQuota(int64(d.Get("quota").(int)))
 	}
 
 	if d.HasChange("refquota") {
-		input.SetRefquota(d.Get("refquota").(int64))
+		input.SetRefquota(int64(d.Get("refquota").(int)))
 	}
 
 	if input.AnySelected() {
