@@ -492,6 +492,10 @@ func resourceVpsUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChange("diskspace") {
 		vps, err := vpsShow(api, id)
+		if err != nil {
+			return err
+		}
+
 		datasetUpdate := api.Dataset.Update.Prepare()
 		datasetUpdate.SetPathParamInt("dataset_id", vps.Dataset.Id)
 		datasetUpdate.SetInput(&client.ActionDatasetUpdateInput{
