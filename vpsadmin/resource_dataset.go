@@ -319,7 +319,7 @@ func resourceDatasetDelete(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if ds.Export != nil {
-		log.Printf("[INFO] Deleting dataset export: %s", ds.Export.Id)
+		log.Printf("[INFO] Deleting dataset export: %d", ds.Export.Id)
 
 		if err := deleteDatasetExport(api, ds.Export.Id); err != nil {
 			return err
