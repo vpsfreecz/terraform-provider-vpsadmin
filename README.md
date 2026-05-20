@@ -5,7 +5,20 @@ Requirements
 ------------
 
 - [Terraform](https://www.terraform.io/downloads.html) 1.x
-- [Go](https://golang.org/doc/install) 1.16+ (to build the provider plugin)
+- [Go](https://golang.org/doc/install) 1.26.3 (to build the provider plugin)
+
+With Nix, enter the provider development environment with:
+
+```sh
+$ nix develop
+```
+
+For the examples environment, including OpenTofu and the `get-token` helper,
+run:
+
+```sh
+$ nix develop .#examples
+```
 
 Building The Provider
 ---------------------
@@ -33,7 +46,7 @@ Developing the Provider
 -----------------------
 
 If you wish to work on the provider, you'll first need [Go](http://www.golang.org)
-installed on your machine (version 1.16+ is *required*).
+installed on your machine (version 1.26.3 is *required*).
 To compile the provider, run:
 
 ```sh

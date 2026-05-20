@@ -13,7 +13,7 @@ This repository is a Go Terraform provider for vpsAdmin. The provider entry poin
 - `go test ./...`: runs tests for the main provider module.
 - `(cd get-token && go test ./...)`: runs tests for the nested helper module.
 
-Use `nix-shell` when you want the repository-provided development environment. The examples use OpenTofu/Terraform style commands: `init`, `plan`, and `apply`.
+Use `nix develop` when you want the repository-provided development environment. The examples use OpenTofu/Terraform style commands: `init`, `plan`, and `apply`.
 
 ## Coding Style & Naming Conventions
 
