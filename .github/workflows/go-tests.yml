@@ -1,0 +1,62 @@
+name: Go Tests
+
+on:
+  push:
+    paths:
+      - .github/workflows/go-tests.yml
+      - Makefile
+      - go.mod
+      - go.sum
+      - '*.go'
+      - tools/**
+      - vpsadmin/**
+      - get-token/**
+  pull_request:
+    paths:
+      - .github/workflows/go-tests.yml
+      - Makefile
+      - go.mod
+      - go.sum
+      - '*.go'
+      - tools/**
+      - vpsadmin/**
+      - get-token/**
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Go ${{ matrix.go-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version:
+          - '1.25.x'
+          - '1.26.x'
+
+    env:
+      GOTOOLCHAIN: local
+
+    steps:
+      - name: Checkout provider
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Set up Go
+        uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
+        with:
+          go-version: ${{ matrix.go-version }}
+          check-latest: true
+          cache: true
+          cache-dependency-path: |
+            go.sum
+            get-token/go.sum
+
+      - name: Test provider module
+        run: make test
+
+      - name: Test token helper module
+        run: make test-get-token
