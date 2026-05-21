@@ -26,9 +26,22 @@ Add focused Go tests next to the code they cover using standard `*_test.go` nami
 
 ## Commit & Pull Request Guidelines
 
-Recent commits use short, imperative messages, often scoped with a prefix such as `examples:` or `get-token:`. Keep the first line concise, for example `examples: use opentofu` or `get-token: update dependencies`. Pull requests should describe the behavior change, note any generated docs updates, list test commands run, and link related issues when available.
+- Use short imperative subjects, often scoped (`examples: use opentofu`,
+  `get-token: update dependencies`); keep one logical change per commit.
+- Every commit message must explain what the change does and why it is
+  needed; use the subject for the action and the body for the rationale
+  when needed.
+- Wrap every commit message line at 80 characters or fewer.
+- Always write the commit message to a temporary file and commit with
+  `git commit -F <tmpfile>` instead of passing the message inline.
 
-Every commit must be created from a temporary message file, not with `git commit -m`. Each commit message must explain what changed and why, including the problem and the solution. No commit message line may exceed 80 characters; validate the temporary file line lengths before committing with `git commit -F "$msgfile"`.
+- Flake input updates flow:
+  1. Read current rev: `nix flake metadata --json . | jq -r '.locks.nodes.<input>.locked.rev'`.
+  2. Update input: `nix flake update <input>` (or `nix flake lock --update-input <input>`).
+  3. Verify only `flake.lock` changed for this update commit.
+  4. Commit with subject format: `flake: <input> <old9> -> <new9>` (example: `flake: vpsadmin f9db2d4ff -> 123456789`).
+
+Pull requests should describe the behavior change, note any generated docs updates, list test commands run, and link related issues when available.
 
 ## Security & Configuration Tips
 
