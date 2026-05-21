@@ -1,6 +1,6 @@
 module github.com/vpsfreecz/terraform-provider-vpsadmin
 
-go 1.26.3
+go 1.25.8
 
 require (
 	github.com/hashicorp/go-cty v1.5.0
