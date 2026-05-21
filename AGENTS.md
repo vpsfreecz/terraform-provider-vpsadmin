@@ -10,8 +10,9 @@ This repository is a Go Terraform provider for vpsAdmin. The provider entry poin
 - `make install`: copies the built provider to `~/.terraform.d/plugins/terraform.vpsfree.cz/vpsfreecz/vpsadmin/<version>/<platform>/`.
 - `make fmt`: runs `go fmt` for the root package and `vpsadmin/`.
 - `make docs`: runs `go generate`, which invokes `tfplugindocs` from `main.go`.
-- `go test ./...`: runs tests for the main provider module.
-- `(cd get-token && go test ./...)`: runs tests for the nested helper module.
+- `make test`: runs Go tests for the main provider module.
+- `make test-get-token`: runs Go tests for the nested helper module.
+- `make test-integration`: runs ci-tagged integration tests through `test-runner.sh`.
 
 Use `nix develop` when you want the repository-provided development environment. The examples use OpenTofu/Terraform style commands: `init`, `plan`, and `apply`.
 
@@ -21,7 +22,7 @@ Follow `gofmt` formatting. Go files use tabs with width 4; Terraform files use t
 
 ## Testing Guidelines
 
-Add focused Go tests next to the code they cover using standard `*_test.go` naming. Prefer unit tests for schema behavior, helper logic, and API request shaping. Run `go test ./...` before submitting provider changes, and run the `get-token` test command when changing that module.
+Add focused Go tests next to the code they cover using standard `*_test.go` naming. Prefer unit tests for schema behavior, helper logic, and API request shaping. Run both `make test` and `make test-get-token` before submitting Go changes. CI runs both commands against the latest patch releases of the supported Go major versions; update the workflow matrix when Go's supported release window changes. The `go` directive in `go.mod` is the minimum supported toolchain version, not a patch-level lock. For integration-test or provider workflow changes, run `make test-integration` or the focused `./test-runner.sh test ...` command.
 
 ## Commit & Pull Request Guidelines
 
