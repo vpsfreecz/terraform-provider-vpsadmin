@@ -10,7 +10,7 @@ func getPublicKeyByLabel(api *client.Client, userId int64, label string) (*clien
 	list.SetPathParamInt("user_id", userId)
 
 	input := list.NewInput()
-	input.SetLimit(10000)
+	input.SetLimit(apiPageLimit)
 
 	resp, err := list.Call()
 

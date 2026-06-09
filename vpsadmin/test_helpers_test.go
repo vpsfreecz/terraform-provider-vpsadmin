@@ -22,6 +22,14 @@ func newTestConfig(t *testing.T, handler http.HandlerFunc) *Config {
 	}
 }
 
+func assertQueryValue(t *testing.T, r *http.Request, key string, want string) {
+	t.Helper()
+
+	if got := r.URL.Query().Get(key); got != want {
+		t.Fatalf("%s = %q, want %q", key, got, want)
+	}
+}
+
 func writeAPIResponse(t *testing.T, w http.ResponseWriter, key string, value interface{}) {
 	t.Helper()
 

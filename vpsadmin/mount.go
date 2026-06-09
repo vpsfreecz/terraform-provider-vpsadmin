@@ -24,7 +24,7 @@ func mountShow(api *client.Client, vpsId int, mountId int) (*client.ActionVpsMou
 func mountFindById(api *client.Client, id int) (*client.ActionVpsMountShowOutput, error) {
 	vpsList := api.Vps.Index.Prepare()
 	vpsList.SetInput(&client.ActionVpsIndexInput{
-		Limit: 10000,
+		Limit: apiPageLimit,
 	})
 	vpsList.Input.SelectParameters("Limit")
 

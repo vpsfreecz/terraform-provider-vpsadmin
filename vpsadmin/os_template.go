@@ -8,7 +8,7 @@ import (
 func getOsTemplateIdByName(api *client.Client, name string) (int64, error) {
 	list := api.OsTemplate.Index.Prepare()
 	list.SetInput(&client.ActionOsTemplateIndexInput{
-		Limit: 10000,
+		Limit: apiPageLimit,
 	})
 	list.Input.SelectParameters("Limit")
 	resp, err := list.Call()

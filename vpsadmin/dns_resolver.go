@@ -8,7 +8,7 @@ import (
 func getDnsResolverIdByLabel(api *client.Client, label string) (int64, error) {
 	list := api.DnsResolver.Index.Prepare()
 	list.SetInput(&client.ActionDnsResolverIndexInput{
-		Limit: 10000,
+		Limit: apiPageLimit,
 	})
 	list.Input.SelectParameters("Limit")
 	resp, err := list.Call()
