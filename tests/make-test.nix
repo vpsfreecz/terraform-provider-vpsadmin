@@ -1,14 +1,14 @@
 testFn:
 {
-  vpsadminosPath,
+  testFramework,
   vpsadminPath,
   providerPackage,
   ...
 }@args:
 let
-  upstream = import (vpsadminosPath + "/tests/make-test.nix") testFn;
+  upstream = testFramework.makeTest testFn;
   mergedExtraArgs = {
-    vpsadminos = vpsadminosPath;
+    vpsadminos = testFramework.sourcePath;
     vpsadmin = vpsadminPath;
     inherit providerPackage;
   }

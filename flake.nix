@@ -32,13 +32,10 @@
           inherit system;
         };
 
-      suiteArgsFor =
-        system:
-        {
-          vpsadminosPath = vpsadminos.outPath;
-          vpsadminPath = vpsadmin.outPath;
-          providerPackage = self.packages.${system}.terraform-provider-vpsadmin;
-        };
+      suiteArgsFor = system: {
+        vpsadminPath = vpsadmin.outPath;
+        providerPackage = self.packages.${system}.terraform-provider-vpsadmin;
+      };
     in
     {
       packages = forAllSystems (
@@ -46,9 +43,9 @@
         let
           pkgs = pkgsFor system;
           go = pkgs.go_1_26;
-          assertGoVersion =
-            pkgs.lib.assertMsg (go.version == "1.26.3")
-              "terraform-provider-vpsadmin requires Go 1.26.3, got ${go.version}";
+          assertGoVersion = pkgs.lib.assertMsg (
+            go.version == "1.26.3"
+          ) "terraform-provider-vpsadmin requires Go 1.26.3, got ${go.version}";
           providerSource = pkgs.lib.cleanSourceWith {
             src = ./.;
             filter =
@@ -117,9 +114,9 @@
         let
           pkgs = pkgsFor system;
           go = pkgs.go_1_26;
-          assertGoVersion =
-            pkgs.lib.assertMsg (go.version == "1.26.3")
-              "terraform-provider-vpsadmin requires Go 1.26.3, got ${go.version}";
+          assertGoVersion = pkgs.lib.assertMsg (
+            go.version == "1.26.3"
+          ) "terraform-provider-vpsadmin requires Go 1.26.3, got ${go.version}";
           get-token = self.packages.${system}.get-token;
         in
         assert assertGoVersion;
