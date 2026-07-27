@@ -1,6 +1,6 @@
 TARGET = terraform-provider-vpsadmin
 PLUGIN_DIR = ~/.terraform.d/plugins
-VERSION = 1.2.0
+VERSION = 1.3.0
 PLATFORM = linux_amd64
 PROVIDER_DIR = terraform.vpsfree.cz/vpsfreecz/vpsadmin/$(VERSION)/$(PLATFORM)
 
