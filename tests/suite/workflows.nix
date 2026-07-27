@@ -716,7 +716,7 @@ import ../make-test.nix (
       after(:suite) do
         if @token
           services.execute(
-            "#{env_prefix(tofu_env(workdir, api_url, @token))} tofu -chdir=#{Shellwords.escape(workdir)} destroy -auto-approve -input=false",
+            "#{env_prefix(tofu_env(workdir, api_url, @token))} tofu -chdir=#{Shellwords.escape(workdir)} destroy -auto-approve -input=false -parallelism=1",
             timeout: 1800
           )
         end
@@ -770,7 +770,7 @@ import ../make-test.nix (
 
         it 'creates provider resources, reads data sources, and allocates IP addresses' do
           require_provider_workflow_setup!
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
 
           state = tofu_state(services, workdir, api_url, @token)
           @ssh_key_id = managed_state_attrs(state, 'vpsadmin_ssh_key', 'provider_it').fetch('id')
@@ -840,7 +840,7 @@ import ../make-test.nix (
           )
           write_provider_config(services, workdir, public_key, location, os_template, @attrs)
 
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
 
           state = tofu_state(services, workdir, api_url, @token)
           assert_state_for_attrs(state, @attrs)
@@ -878,7 +878,7 @@ import ../make-test.nix (
           without_mount = @attrs.merge(include_mount: false)
           write_provider_config(services, workdir, public_key, location, os_template, without_mount)
 
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
           snapshot = workflow_snapshot(
             services,
             vps_id: @vps_id,
@@ -894,7 +894,7 @@ import ../make-test.nix (
           expect_no_diff(services, workdir, api_url, @token)
 
           write_provider_config(services, workdir, public_key, location, os_template, @attrs)
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
           state = tofu_state(services, workdir, api_url, @token)
           @mount_id = managed_state_attrs(state, 'vpsadmin_mount', 'provider_it').fetch('id')
           expect(@mount_id).to match(/\A[0-9]+\z/)
@@ -927,7 +927,7 @@ import ../make-test.nix (
           without_export = @attrs.merge(export_dataset: false)
           write_provider_config(services, workdir, public_key, location, os_template, without_export)
 
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
           state = tofu_state(services, workdir, api_url, @token)
           nas_dataset_attrs = data_state_attrs(state, 'vpsadmin_dataset', 'provider_export')
           expect(nas_dataset_attrs.fetch('export_dataset')).to eq(false)
@@ -947,7 +947,7 @@ import ../make-test.nix (
           expect_no_diff(services, workdir, api_url, @token)
 
           write_provider_config(services, workdir, public_key, location, os_template, @attrs)
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
           state = tofu_state(services, workdir, api_url, @token)
           @export_id = managed_state_attrs(state, 'vpsadmin_dataset', 'provider_export').fetch('export_id')
           expect(@export_id).to be_a(Integer)
@@ -1018,7 +1018,7 @@ import ../make-test.nix (
           @attrs = @attrs.merge(include_ssh_keys: true)
           write_provider_config(services, workdir, public_key, location, os_template, @attrs)
 
-          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'apply -auto-approve -input=false -parallelism=1')
 
           authorized_keys = nil
           wait_until_block_succeeds(name: "public key deployed to VPS #{@vps_id}") do
@@ -1049,7 +1049,7 @@ import ../make-test.nix (
           )
           wait_for_vps_on_node(services, vps_id: @vps_id, node_id: node1_id, running: false)
 
-          tofu(services, workdir, api_url, @token, 'destroy -auto-approve -input=false')
+          tofu(services, workdir, api_url, @token, 'destroy -auto-approve -input=false -parallelism=1')
 
           snapshot = workflow_snapshot(
             services,
