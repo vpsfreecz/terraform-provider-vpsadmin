@@ -42,10 +42,6 @@
         system:
         let
           pkgs = pkgsFor system;
-          go = pkgs.go_1_26;
-          assertGoVersion = pkgs.lib.assertMsg (
-            go.version == "1.26.3"
-          ) "terraform-provider-vpsadmin requires Go 1.26.3, got ${go.version}";
           providerSource = pkgs.lib.cleanSourceWith {
             src = ./.;
             filter =
@@ -72,7 +68,6 @@
             vendorHash = "sha256-KSCApDutkD45JIINXOrIbyk4uvDS9DifmiYCzeI0i/4=";
           };
         in
-        assert assertGoVersion;
         {
           inherit get-token terraform-provider-vpsadmin;
           default = terraform-provider-vpsadmin;
@@ -114,12 +109,8 @@
         let
           pkgs = pkgsFor system;
           go = pkgs.go_1_26;
-          assertGoVersion = pkgs.lib.assertMsg (
-            go.version == "1.26.3"
-          ) "terraform-provider-vpsadmin requires Go 1.26.3, got ${go.version}";
           get-token = self.packages.${system}.get-token;
         in
-        assert assertGoVersion;
         {
           default = pkgs.mkShell {
             packages = [
