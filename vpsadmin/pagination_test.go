@@ -38,6 +38,9 @@ func TestGetOsTemplateIdByNameUsesAllowedPageLimit(t *testing.T) {
 		}
 
 		assertQueryValue(t, r, "os_template[limit]", strconv.Itoa(apiPageLimit))
+		if _, ok := r.URL.Query()["os_template[hypervisor_type]"]; ok {
+			t.Fatal("os_template[hypervisor_type] must be omitted")
+		}
 		writeAPIResponse(t, w, "os_templates", []*client.ActionOsTemplateIndexOutput{
 			{Id: 2, Name: "debian-latest-x86_64-vpsadminos-minimal"},
 		})
