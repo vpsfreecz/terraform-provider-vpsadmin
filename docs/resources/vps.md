@@ -136,6 +136,7 @@ replacement can proceed.
 - `swap` (Number) Available swap in MB
 - `user_data` (String, Sensitive) Inline user data applied when the VPS is created. Content is limited to 65,535 UTF-8 bytes. Changing this value replaces the VPS. Terraform state stores a SHA-256 digest instead of the content.
 - `user_data_format` (String) Format of `user_data`. If omitted, `script` is used. Supported values are `script`, `cloudinit_config`, `cloudinit_script`, `nixos_configuration`, `nixos_flake_configuration`, `nixos_flake_uri`. Changing this value replaces the VPS.
+- `vps_user_data_id` (Number) ID of user data stored in vpsAdmin to apply when the VPS is created. Changing the ID replaces the VPS. Later changes to the stored object are not applied to this VPS.
 
 ### Read-Only
 

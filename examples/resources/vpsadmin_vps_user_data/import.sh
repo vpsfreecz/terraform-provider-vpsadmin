@@ -1,0 +1,1 @@
+terraform import vpsadmin_vps_user_data.bootstrap 1234

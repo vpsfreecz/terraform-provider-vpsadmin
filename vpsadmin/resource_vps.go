@@ -170,13 +170,22 @@ support in case you need more.
 				},
 			},
 			"user_data": {
-				Type:         schema.TypeString,
-				Description:  "Inline user data applied when the VPS is created. Content is limited to 65,535 UTF-8 bytes. Changing this value replaces the VPS. Terraform state stores a SHA-256 digest instead of the content.",
-				Optional:     true,
-				ForceNew:     true,
-				Sensitive:    true,
-				StateFunc:    userDataStateHash,
-				ValidateFunc: validateUserDataContent,
+				Type:          schema.TypeString,
+				Description:   "Inline user data applied when the VPS is created. Content is limited to 65,535 UTF-8 bytes. Changing this value replaces the VPS. Terraform state stores a SHA-256 digest instead of the content.",
+				Optional:      true,
+				ForceNew:      true,
+				Sensitive:     true,
+				StateFunc:     userDataStateHash,
+				ValidateFunc:  validateUserDataContent,
+				ConflictsWith: []string{"vps_user_data_id"},
+			},
+			"vps_user_data_id": {
+				Type:          schema.TypeInt,
+				Description:   "ID of user data stored in vpsAdmin to apply when the VPS is created. Changing the ID replaces the VPS. Later changes to the stored object are not applied to this VPS.",
+				Optional:      true,
+				ForceNew:      true,
+				ValidateFunc:  validation.IntAtLeast(1),
+				ConflictsWith: []string{"user_data"},
 			},
 			"user_data_format": {
 				Type:         schema.TypeString,
@@ -277,7 +286,7 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	input.SetIpv4(int64(d.Get("public_ipv4_count").(int)))
 	input.SetIpv4Private(int64(d.Get("private_ipv4_count").(int)))
 	input.SetIpv6(int64(d.Get("public_ipv6_count").(int)))
-	configureVpsInlineUserData(input, d)
+	configureVpsUserData(input, d)
 
 	if v, ok := d.GetOk("start_menu_timeout"); ok {
 		input.SetStartMenuTimeout(int64(v.(int)))
@@ -361,6 +370,15 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	return resourceVpsRead(d, m)
+}
+
+func configureVpsUserData(input *client.ActionVpsCreateInput, d *schema.ResourceData) {
+	if storedUserData, ok := d.GetOk("vps_user_data_id"); ok {
+		input.SetVpsUserData(int64(storedUserData.(int)))
+		return
+	}
+
+	configureVpsInlineUserData(input, d)
 }
 
 func configureVpsInlineUserData(input *client.ActionVpsCreateInput, d *schema.ResourceData) {

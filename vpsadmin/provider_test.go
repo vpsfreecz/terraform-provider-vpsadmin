@@ -53,6 +53,7 @@ func TestProviderRegistersExpectedDataSources(t *testing.T) {
 		"vpsadmin_mount",
 		"vpsadmin_ssh_key",
 		"vpsadmin_vps",
+		"vpsadmin_vps_user_data",
 	})
 
 	for name, dataSource := range provider.DataSourcesMap {
@@ -76,6 +77,7 @@ func TestProviderRegistersExpectedResources(t *testing.T) {
 		"vpsadmin_mount",
 		"vpsadmin_ssh_key",
 		"vpsadmin_vps",
+		"vpsadmin_vps_user_data",
 	})
 
 	for name, resource := range provider.ResourcesMap {

@@ -186,3 +186,80 @@ func TestRedactedVpsCreateInputHidesUserData(t *testing.T) {
 		t.Fatal("redaction modified the API input")
 	}
 }
+
+func TestResourceVpsStoredUserDataSchema(t *testing.T) {
+	t.Parallel()
+
+	resource := resourceVps()
+	field := resource.Schema["vps_user_data_id"]
+	if !field.Optional || !field.ForceNew {
+		t.Fatalf("unexpected vps_user_data_id schema: %#v", field)
+	}
+	if _, errors := field.ValidateFunc(0, "vps_user_data_id"); len(errors) == 0 {
+		t.Error("vps_user_data_id accepted zero")
+	}
+	if _, errors := field.ValidateFunc(42, "vps_user_data_id"); len(errors) != 0 {
+		t.Errorf("vps_user_data_id rejected a positive ID: %v", errors)
+	}
+
+	baseConfig := map[string]interface{}{
+		"location":            "test",
+		"install_os_template": "debian-latest",
+		"cpu":                 1,
+		"memory":              1024,
+		"diskspace":           4096,
+		"vps_user_data_id":    42,
+	}
+	if diagnostics := schema.InternalMap(resource.Schema).Validate(
+		terraform.NewResourceConfigRaw(baseConfig),
+	); len(diagnostics) != 0 {
+		t.Fatalf("schema rejected stored user data by itself: %#v", diagnostics)
+	}
+
+	conflictingConfig := map[string]interface{}{
+		"location":            "test",
+		"install_os_template": "debian-latest",
+		"cpu":                 1,
+		"memory":              1024,
+		"diskspace":           4096,
+		"user_data":           "#!/bin/sh\ntrue\n",
+		"vps_user_data_id":    42,
+	}
+	if diagnostics := schema.InternalMap(resource.Schema).Validate(
+		terraform.NewResourceConfigRaw(conflictingConfig),
+	); len(diagnostics) == 0 {
+		t.Fatal("schema accepted inline and stored user data together")
+	}
+
+	formatWithStoredConfig := map[string]interface{}{
+		"location":            "test",
+		"install_os_template": "debian-latest",
+		"cpu":                 1,
+		"memory":              1024,
+		"diskspace":           4096,
+		"user_data_format":    "script",
+		"vps_user_data_id":    42,
+	}
+	if diagnostics := schema.InternalMap(resource.Schema).Validate(
+		terraform.NewResourceConfigRaw(formatWithStoredConfig),
+	); len(diagnostics) == 0 {
+		t.Fatal("schema accepted an inline format with stored user data")
+	}
+}
+
+func TestConfigureVpsStoredUserData(t *testing.T) {
+	t.Parallel()
+
+	d := schema.TestResourceDataRaw(t, resourceVps().Schema, map[string]interface{}{
+		"vps_user_data_id": 42,
+	})
+	input := &client.ActionVpsCreateInput{}
+	configureVpsUserData(input, d)
+
+	if input.VpsUserData != 42 {
+		t.Fatalf("VpsUserData = %d, want 42", input.VpsUserData)
+	}
+	if input.UserDataContent != "" || input.UserDataFormat != "" {
+		t.Fatalf("stored user data also configured inline content: %#v", input)
+	}
+}

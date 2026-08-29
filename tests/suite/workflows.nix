@@ -223,6 +223,9 @@ import ../make-test.nix (
           include_ssh_keys: false,
           include_mount: true,
           inline_user_data: "#!/bin/sh\nprintf 'inline user data\\n' > /root/provider-inline-user-data\n",
+          stored_user_data_label: 'provider stored user data',
+          stored_user_data: "#!/bin/sh\nprintf 'stored user data\\n' > /root/provider-stored-user-data\n",
+          stored_user_data_reference: 'vpsadmin_vps_user_data.provider_it.id',
           dataset_refquota: 1024,
           mount_enable: false,
           mount_on_start_fail: 'mount_later',
@@ -294,6 +297,22 @@ import ../make-test.nix (
             depends_on = [vpsadmin_ssh_key.provider_it]
           }
 
+          resource "vpsadmin_vps_user_data" "provider_it" {
+            label   = #{attrs.fetch(:stored_user_data_label).inspect}
+            format  = "script"
+            content = #{attrs.fetch(:stored_user_data).inspect}
+          }
+
+          resource "vpsadmin_vps_user_data" "alternate" {
+            label   = "provider alternate stored user data"
+            format  = "script"
+            content = "#!/bin/sh\\nprintf 'alternate stored user data\\n' > /root/provider-stored-user-data\\n"
+          }
+
+          data "vpsadmin_vps_user_data" "provider_it" {
+            vps_user_data_id = vpsadmin_vps_user_data.provider_it.id
+          }
+
           resource "vpsadmin_vps" "provider_it" {
             location             = #{location.inspect}
             install_os_template  = #{os_template.inspect}
@@ -325,6 +344,19 @@ import ../make-test.nix (
             private_ipv4_count   = 0
             public_ipv6_count    = 0
             user_data            = #{attrs.fetch(:inline_user_data).inspect}
+          }
+
+          resource "vpsadmin_vps" "stored_user_data" {
+            location             = #{location.inspect}
+            install_os_template  = #{os_template.inspect}
+            hostname             = "provider-stored-user-data"
+            cpu                  = 1
+            memory               = 1024
+            diskspace            = 4096
+            public_ipv4_count    = 0
+            private_ipv4_count   = 0
+            public_ipv6_count    = 0
+            vps_user_data_id     = #{attrs.fetch(:stored_user_data_reference)}
           }
 
           data "vpsadmin_vps" "provider_it" {
@@ -440,7 +472,7 @@ import ../make-test.nix (
           location.update!(has_ipv6: true)
           env = location.environment
           user_config = user.environment_user_configs.find_by!(environment: env)
-          user_config.update!(max_vps_count: [user_config.max_vps_count, 2].max)
+          user_config.update!(max_vps_count: [user_config.max_vps_count, 3].max)
 
           [
             ['ipv4', 'IPv4 address', 0, 64, 1, :object, 'Ip::Free', 4],
@@ -826,6 +858,17 @@ import ../make-test.nix (
           @ssh_key_id = managed_state_attrs(state, 'vpsadmin_ssh_key', 'provider_it').fetch('id')
           @vps_id = managed_state_attrs(state, 'vpsadmin_vps', 'provider_it').fetch('id')
           @inline_vps_id = managed_state_attrs(state, 'vpsadmin_vps', 'inline_user_data').fetch('id')
+          @stored_vps_id = managed_state_attrs(state, 'vpsadmin_vps', 'stored_user_data').fetch('id')
+          @stored_user_data_id = managed_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'provider_it'
+          ).fetch('id')
+          @alternate_user_data_id = managed_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'alternate'
+          ).fetch('id')
           @dataset_id = managed_state_attrs(state, 'vpsadmin_dataset', 'provider_it').fetch('id')
           @mount_id = managed_state_attrs(state, 'vpsadmin_mount', 'provider_it').fetch('id')
           nas_dataset_attrs = managed_state_attrs(state, 'vpsadmin_dataset', 'provider_export')
@@ -839,6 +882,9 @@ import ../make-test.nix (
           expect(@ssh_key_id).to match(/\A[0-9]+\z/)
           expect(@vps_id).to match(/\A[0-9]+\z/)
           expect(@inline_vps_id).to match(/\A[0-9]+\z/)
+          expect(@stored_vps_id).to match(/\A[0-9]+\z/)
+          expect(@stored_user_data_id).to match(/\A[0-9]+\z/)
+          expect(@alternate_user_data_id).to match(/\A[0-9]+\z/)
           expect(@dataset_id).to match(/\A[0-9]+\z/)
           expect(@mount_id).to match(/\A[0-9]+\z/)
           expect(@nas_dataset_id).to match(/\A[0-9]+\z/)
@@ -886,6 +932,59 @@ import ../make-test.nix (
           write_provider_config(services, workdir, public_key, location, os_template, @attrs)
           expect_no_diff(services, workdir, api_url, @token)
 
+          stored_user_data = managed_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'provider_it'
+          )
+          stored_user_data_source = data_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'provider_it'
+          )
+          stored_user_data_hash = Digest::SHA256.hexdigest(@attrs.fetch(:stored_user_data))
+          expect(stored_user_data.fetch('content')).to eq(stored_user_data_hash)
+          expect(stored_user_data_source.fetch('content_sha256')).to eq(stored_user_data_hash)
+          expect(stored_user_data_source.fetch('label')).to eq(
+            @attrs.fetch(:stored_user_data_label)
+          )
+          expect(JSON.dump(state)).not_to include(@attrs.fetch(:stored_user_data))
+
+          wait_until_block_succeeds(name: "stored user data applied to VPS #{@stored_vps_id}") do
+            _, output = vps_exec(
+              node,
+              vps_id: @stored_vps_id,
+              command: 'cat /root/provider-stored-user-data',
+              timeout: 120
+            )
+            output == "stored user data\n"
+          end
+
+          alternate_reference = @attrs.merge(
+            stored_user_data_reference: 'vpsadmin_vps_user_data.alternate.id'
+          )
+          write_provider_config(
+            services,
+            workdir,
+            public_key,
+            location,
+            os_template,
+            alternate_reference
+          )
+          replacement_plan = tofu_plan_json(
+            services,
+            workdir,
+            api_url,
+            @token,
+            'stored-user-data-replacement'
+          )
+          expect(planned_resource_actions(
+            replacement_plan,
+            'vpsadmin_vps.stored_user_data'
+          )).to eq(['delete', 'create'])
+          write_provider_config(services, workdir, public_key, location, os_template, @attrs)
+          expect_no_diff(services, workdir, api_url, @token)
+
           snapshot = workflow_snapshot(
             services,
             vps_id: @vps_id,
@@ -929,7 +1028,10 @@ import ../make-test.nix (
             export_enable: false,
             export_root_squash: true,
             export_read_write: false,
-            export_sync: false
+            export_sync: false,
+
+            stored_user_data_label: 'provider stored user data renamed',
+            stored_user_data: "#!/bin/sh\nprintf 'changed stored user data\\n' > /root/provider-stored-user-data\n"
           )
           write_provider_config(services, workdir, public_key, location, os_template, @attrs)
 
@@ -937,6 +1039,36 @@ import ../make-test.nix (
 
           state = tofu_state(services, workdir, api_url, @token)
           assert_state_for_attrs(state, @attrs)
+          expect(managed_state_attrs(
+            state,
+            'vpsadmin_vps',
+            'stored_user_data'
+          ).fetch('id')).to eq(@stored_vps_id)
+          expect(managed_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'provider_it'
+          ).fetch('id')).to eq(@stored_user_data_id)
+          updated_stored_user_data_hash = Digest::SHA256.hexdigest(
+            @attrs.fetch(:stored_user_data)
+          )
+          expect(managed_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'provider_it'
+          ).fetch('content')).to eq(updated_stored_user_data_hash)
+          expect(data_state_attrs(
+            state,
+            'vpsadmin_vps_user_data',
+            'provider_it'
+          ).fetch('content_sha256')).to eq(updated_stored_user_data_hash)
+          _, stored_user_data_output = vps_exec(
+            node,
+            vps_id: @stored_vps_id,
+            command: 'cat /root/provider-stored-user-data',
+            timeout: 120
+          )
+          expect(stored_user_data_output).to eq("stored user data\n")
           vps_attrs = data_state_attrs(state, 'vpsadmin_vps', 'provider_it')
           expect(vps_attrs.fetch('public_ipv4_address')).to eq(@public_ipv4)
           expect(vps_attrs.fetch('private_ipv4_address')).to eq(@private_ipv4)
@@ -1079,7 +1211,8 @@ import ../make-test.nix (
             'vpsadmin_dataset.provider_it',
             'vpsadmin_dataset.provider_export',
             'vpsadmin_vps.provider_it',
-            'vpsadmin_ssh_key.provider_it'
+            'vpsadmin_ssh_key.provider_it',
+            'vpsadmin_vps_user_data.provider_it'
           )
 
           tofu_import(services, workdir, api_url, @token, 'vpsadmin_ssh_key.provider_it', @ssh_key_id)
@@ -1101,6 +1234,14 @@ import ../make-test.nix (
             @nas_dataset_name
           )
           tofu_import(services, workdir, api_url, @token, 'vpsadmin_mount.provider_it', @mount_id)
+          tofu_import(
+            services,
+            workdir,
+            api_url,
+            @token,
+            'vpsadmin_vps_user_data.provider_it',
+            @stored_user_data_id
+          )
 
           expect_no_diff(services, workdir, api_url, @token)
           complete_provider_workflow_step!(6)
@@ -1136,7 +1277,7 @@ import ../make-test.nix (
 
         it 'destroys provider resources and releases assigned IP addresses' do
           require_provider_workflow_step!(7)
-          [@vps_id, @inline_vps_id].each do |vps_id|
+          [@vps_id, @inline_vps_id, @stored_vps_id].each do |vps_id|
             services.vpsadminctl.succeeds(
               args: ['vps', 'stop', vps_id],
               parameters: { force: true }
@@ -1162,6 +1303,17 @@ import ../make-test.nix (
             puts JSON.dump(object_state: vps.object_state)
           RUBY
           expect(inline_vps.fetch('object_state')).to eq('soft_delete')
+          stored_objects = services.api_ruby_json(code: <<~RUBY)
+            stored_vps = Vps.including_deleted.find(#{Integer(@stored_vps_id)})
+            puts JSON.dump(
+              vps_state: stored_vps.object_state,
+              user_data_deleted: VpsUserData.find_by(id: #{Integer(@stored_user_data_id)}).nil?,
+              alternate_deleted: VpsUserData.find_by(id: #{Integer(@alternate_user_data_id)}).nil?
+            )
+          RUBY
+          expect(stored_objects.fetch('vps_state')).to eq('soft_delete')
+          expect(stored_objects.fetch('user_data_deleted')).to eq(true)
+          expect(stored_objects.fetch('alternate_deleted')).to eq(true)
           expect_absent_or_deleted(snapshot, 'dataset')
           expect_absent_or_deleted(snapshot, 'mount')
           expect_absent_or_deleted(snapshot, 'nas_dataset')
