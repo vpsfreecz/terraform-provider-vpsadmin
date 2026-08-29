@@ -50,6 +50,8 @@ import ../make-test.nix (
     machines = import (vpsadminPath + "/tests/machines/cluster/1-node.nix") clusterArgs;
 
     testScript = common + ''
+      require 'digest'
+
       configure_examples do |config|
         config.default_order = :defined
       end
@@ -138,6 +140,38 @@ import ../make-test.nix (
         )
       end
 
+      def tofu_plan_json(services, workdir, api_url, token, name)
+        plan_path = File.join(workdir, "#{name}.tfplan")
+        tofu(
+          services,
+          workdir,
+          api_url,
+          token,
+          "plan -input=false -out=#{Shellwords.escape(plan_path)}",
+          timeout: 600
+        )
+        _, output = tofu(
+          services,
+          workdir,
+          api_url,
+          token,
+          "show -json #{Shellwords.escape(plan_path)}",
+          timeout: 300
+        )
+        JSON.parse(output)
+      ensure
+        services.execute("rm -f #{Shellwords.escape(plan_path)}") if plan_path
+      end
+
+      def planned_resource_actions(plan, address)
+        change = plan.fetch('resource_changes').find do |candidate|
+          candidate.fetch('address') == address
+        end
+
+        expect(change).not_to be_nil
+        change.fetch('change').fetch('actions')
+      end
+
       def expect_ip_value(value)
         expect(value).to be_a(String)
         expect(value).not_to eq("")
@@ -188,6 +222,7 @@ import ../make-test.nix (
           feature_tun: false,
           include_ssh_keys: false,
           include_mount: true,
+          inline_user_data: "#!/bin/sh\nprintf 'inline user data\\n' > /root/provider-inline-user-data\n",
           dataset_refquota: 1024,
           mount_enable: false,
           mount_on_start_fail: 'mount_later',
@@ -277,6 +312,19 @@ import ../make-test.nix (
             feature_ppp          = #{attrs.fetch(:feature_ppp)}
             feature_tun          = #{attrs.fetch(:feature_tun)}
             #{ssh_keys_hcl}
+          }
+
+          resource "vpsadmin_vps" "inline_user_data" {
+            location             = #{location.inspect}
+            install_os_template  = #{os_template.inspect}
+            hostname             = "provider-inline-user-data"
+            cpu                  = 1
+            memory               = 1024
+            diskspace            = 4096
+            public_ipv4_count    = 0
+            private_ipv4_count   = 0
+            public_ipv6_count    = 0
+            user_data            = #{attrs.fetch(:inline_user_data).inspect}
           }
 
           data "vpsadmin_vps" "provider_it" {
@@ -391,6 +439,8 @@ import ../make-test.nix (
           location = Location.find_by!(label: #{location.inspect})
           location.update!(has_ipv6: true)
           env = location.environment
+          user_config = user.environment_user_configs.find_by!(environment: env)
+          user_config.update!(max_vps_count: [user_config.max_vps_count, 2].max)
 
           [
             ['ipv4', 'IPv4 address', 0, 64, 1, :object, 'Ip::Free', 4],
@@ -775,6 +825,7 @@ import ../make-test.nix (
           state = tofu_state(services, workdir, api_url, @token)
           @ssh_key_id = managed_state_attrs(state, 'vpsadmin_ssh_key', 'provider_it').fetch('id')
           @vps_id = managed_state_attrs(state, 'vpsadmin_vps', 'provider_it').fetch('id')
+          @inline_vps_id = managed_state_attrs(state, 'vpsadmin_vps', 'inline_user_data').fetch('id')
           @dataset_id = managed_state_attrs(state, 'vpsadmin_dataset', 'provider_it').fetch('id')
           @mount_id = managed_state_attrs(state, 'vpsadmin_mount', 'provider_it').fetch('id')
           nas_dataset_attrs = managed_state_attrs(state, 'vpsadmin_dataset', 'provider_export')
@@ -787,11 +838,53 @@ import ../make-test.nix (
 
           expect(@ssh_key_id).to match(/\A[0-9]+\z/)
           expect(@vps_id).to match(/\A[0-9]+\z/)
+          expect(@inline_vps_id).to match(/\A[0-9]+\z/)
           expect(@dataset_id).to match(/\A[0-9]+\z/)
           expect(@mount_id).to match(/\A[0-9]+\z/)
           expect(@nas_dataset_id).to match(/\A[0-9]+\z/)
           expect(@export_id).to be_a(Integer)
           assert_state_for_attrs(state, @attrs)
+
+          inline_vps = managed_state_attrs(state, 'vpsadmin_vps', 'inline_user_data')
+          expect(inline_vps.fetch('user_data')).to eq(
+            Digest::SHA256.hexdigest(@attrs.fetch(:inline_user_data))
+          )
+          expect(JSON.dump(state)).not_to include(@attrs.fetch(:inline_user_data))
+
+          wait_until_block_succeeds(name: "inline user data applied to VPS #{@inline_vps_id}") do
+            _, output = vps_exec(
+              node,
+              vps_id: @inline_vps_id,
+              command: 'cat /root/provider-inline-user-data',
+              timeout: 120
+            )
+            output == "inline user data\n"
+          end
+
+          changed_inline_user_data = @attrs.merge(
+            inline_user_data: "#!/bin/sh\nprintf 'changed inline user data\\n' > /root/provider-inline-user-data\n"
+          )
+          write_provider_config(
+            services,
+            workdir,
+            public_key,
+            location,
+            os_template,
+            changed_inline_user_data
+          )
+          replacement_plan = tofu_plan_json(
+            services,
+            workdir,
+            api_url,
+            @token,
+            'inline-user-data-replacement'
+          )
+          expect(planned_resource_actions(
+            replacement_plan,
+            'vpsadmin_vps.inline_user_data'
+          )).to eq(['delete', 'create'])
+          write_provider_config(services, workdir, public_key, location, os_template, @attrs)
+          expect_no_diff(services, workdir, api_url, @token)
 
           snapshot = workflow_snapshot(
             services,
@@ -1043,11 +1136,13 @@ import ../make-test.nix (
 
         it 'destroys provider resources and releases assigned IP addresses' do
           require_provider_workflow_step!(7)
-          services.vpsadminctl.succeeds(
-            args: ['vps', 'stop', @vps_id],
-            parameters: { force: true }
-          )
-          wait_for_vps_on_node(services, vps_id: @vps_id, node_id: node1_id, running: false)
+          [@vps_id, @inline_vps_id].each do |vps_id|
+            services.vpsadminctl.succeeds(
+              args: ['vps', 'stop', vps_id],
+              parameters: { force: true }
+            )
+            wait_for_vps_on_node(services, vps_id: vps_id, node_id: node1_id, running: false)
+          end
 
           tofu(services, workdir, api_url, @token, 'destroy -auto-approve -input=false -parallelism=1')
 
@@ -1062,6 +1157,11 @@ import ../make-test.nix (
           )
           expect(snapshot.fetch('ssh_key')).to be_nil
           expect(snapshot.fetch('vps').fetch('object_state')).to eq('soft_delete')
+          inline_vps = services.api_ruby_json(code: <<~RUBY)
+            vps = Vps.including_deleted.find(#{Integer(@inline_vps_id)})
+            puts JSON.dump(object_state: vps.object_state)
+          RUBY
+          expect(inline_vps.fetch('object_state')).to eq('soft_delete')
           expect_absent_or_deleted(snapshot, 'dataset')
           expect_absent_or_deleted(snapshot, 'mount')
           expect_absent_or_deleted(snapshot, 'nas_dataset')

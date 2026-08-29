@@ -169,6 +169,27 @@ support in case you need more.
 					ValidateFunc: validation.NoZeroValues,
 				},
 			},
+			"user_data": {
+				Type:         schema.TypeString,
+				Description:  "Inline user data applied when the VPS is created. Content is limited to 65,535 UTF-8 bytes. Changing this value replaces the VPS. Terraform state stores a SHA-256 digest instead of the content.",
+				Optional:     true,
+				ForceNew:     true,
+				Sensitive:    true,
+				StateFunc:    userDataStateHash,
+				ValidateFunc: validateUserDataContent,
+			},
+			"user_data_format": {
+				Type:         schema.TypeString,
+				Description:  fmt.Sprintf("Format of `user_data`. If omitted, `script` is used. Supported values are %s. Changing this value replaces the VPS.", supportedUserDataFormatsText),
+				Optional:     true,
+				ForceNew:     true,
+				RequiredWith: []string{"user_data"},
+				ValidateFunc: validation.StringInSlice(supportedUserDataFormats, false),
+				DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+					return old == "" && new == defaultUserDataFormat ||
+						old == defaultUserDataFormat && new == ""
+				},
+			},
 			"feature_fuse": {
 				Type:        schema.TypeBool,
 				Description: "Allow access to FUSE filesystems",
@@ -256,12 +277,13 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	input.SetIpv4(int64(d.Get("public_ipv4_count").(int)))
 	input.SetIpv4Private(int64(d.Get("private_ipv4_count").(int)))
 	input.SetIpv6(int64(d.Get("public_ipv6_count").(int)))
+	configureVpsInlineUserData(input, d)
 
 	if v, ok := d.GetOk("start_menu_timeout"); ok {
 		input.SetStartMenuTimeout(int64(v.(int)))
 	}
 
-	log.Printf("[DEBUG] VPS create configuration: %#v", create.Input)
+	log.Printf("[DEBUG] VPS create configuration: %#v", redactedVpsCreateInput(create.Input))
 
 	resp, err := create.Call()
 
@@ -339,6 +361,30 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	return resourceVpsRead(d, m)
+}
+
+func configureVpsInlineUserData(input *client.ActionVpsCreateInput, d *schema.ResourceData) {
+	content, ok := d.GetOk("user_data")
+	if !ok {
+		return
+	}
+
+	format := defaultUserDataFormat
+	if configuredFormat, ok := d.GetOk("user_data_format"); ok {
+		format = configuredFormat.(string)
+	}
+
+	input.SetUserDataContent(content.(string))
+	input.SetUserDataFormat(format)
+}
+
+func redactedVpsCreateInput(input *client.ActionVpsCreateInput) *client.ActionVpsCreateInput {
+	redacted := *input
+	if redacted.UserDataContent != "" {
+		redacted.UserDataContent = "[REDACTED]"
+	}
+
+	return &redacted
 }
 
 func resourceVpsRead(d *schema.ResourceData, m interface{}) error {

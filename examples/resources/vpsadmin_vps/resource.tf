@@ -9,7 +9,7 @@ resource "vpsadmin_vps" "my-vps" {
   # Possible values
   #   - using vpsfree-client: vpsfreectl os_template list -o name
   #   - using curl: curl https://api.vpsfree.cz/os_templates
-  install_os_template = "ubuntu-20.04-x86_64-vpsadminos-minimal"
+  install_os_template = "debian-latest-x86_64-vpsadminos-minimal"
 
   # vpsAdmin-managed hostname
   hostname = "my-vps"
@@ -27,4 +27,22 @@ resource "vpsadmin_vps" "my-vps" {
   ssh_keys = [
     vpsadmin_ssh_key.my-key.id,
   ]
+
+  # User data format. Other supported values:
+  #   - cloudinit_config
+  #   - cloudinit_script
+  #   - nixos_configuration
+  #   - nixos_flake_configuration
+  #   - nixos_flake_uri
+  user_data_format = "script"
+
+  # Script to apply when the VPS is created
+  user_data = <<-EOF
+    #!/bin/sh
+    set -eu
+
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y nginx
+  EOF
 }
