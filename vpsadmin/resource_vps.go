@@ -205,6 +205,43 @@ support in case you need more.
 				Computed:    true,
 				Optional:    true,
 			},
+			"user_data": {
+				Type: schema.TypeList,
+				Description: "User-data configuration for instance initialization.",
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"format": {
+							Type:        schema.TypeString,
+							Optional:    true,
+							Default:     "script",
+							Description: "Format of the user-data script or configuration (e.g., cloud-config).",
+							ValidateFunc: validation.StringInSlice([]string{
+								"script",
+								"cloudinit_config",
+								"cloudinit_script",
+								"nixos_configuration",
+								"nixos_flake_configuration",
+								"nixos_flake_uri",
+							}, false),
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								// This field is used only when the VPS is being created
+								return d.Id() != ""
+							},
+						},
+						"content": {
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Raw content of the user-data payload.",
+							DiffSuppressFunc: func(k, old, new string, d *schema.ResourceData) bool {
+								// This field is used only when the VPS is being created
+								return d.Id() != ""
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -259,6 +296,16 @@ func resourceVpsCreate(d *schema.ResourceData, m interface{}) error {
 
 	if v, ok := d.GetOk("start_menu_timeout"); ok {
 		input.SetStartMenuTimeout(int64(v.(int)))
+	}
+
+	if v, ok := d.GetOk("user_data"); ok {
+		userDataList := v.([]interface{})
+		if len(userDataList) > 0 && userDataList[0] != nil {
+			userDataMap := userDataList[0].(map[string]interface{})
+
+			input.SetUserDataFormat(userDataMap["format"].(string))
+			input.SetUserDataContent(userDataMap["content"].(string))
+		}
 	}
 
 	log.Printf("[DEBUG] VPS create configuration: %#v", create.Input)
