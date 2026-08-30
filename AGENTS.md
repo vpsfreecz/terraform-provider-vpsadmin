@@ -16,6 +16,12 @@ This repository is a Go Terraform provider for vpsAdmin. The provider entry poin
 
 Use `nix develop` when you want the repository-provided development environment. The examples use OpenTofu/Terraform style commands: `init`, `plan`, and `apply`.
 
+Production-facing VPS examples must use an OS template currently returned by
+`https://api.vpsfree.cz/os_templates`. Verify every `install_os_template`
+example value against that endpoint before committing. Template names created
+by vpsAdmin's synthetic test seeds are valid only in tests and must not be
+copied into examples or generated documentation.
+
 ## Coding Style & Naming Conventions
 
 Follow `gofmt` formatting. Go files use tabs with width 4; Terraform files use two-space indentation, as defined in `.editorconfig`. Keep provider names and Terraform identifiers in the existing `vpsadmin_<name>` pattern, for example `vpsadmin_vps` or `vpsadmin_ssh_key`. Resource and data source files follow `resource_<name>.go` and `datasource_<name>.go`.

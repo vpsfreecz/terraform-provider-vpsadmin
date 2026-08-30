@@ -21,7 +21,7 @@ resource "vpsadmin_vps_user_data" "bootstrap" {
 
 resource "vpsadmin_vps" "from-stored-user-data" {
   location            = "Praha"
-  install_os_template = "debian-latest-x86_64-vpsadminos-minimal"
+  install_os_template = "debian-13-x86_64-vpsadminos-minimal"
   hostname            = "web-server"
   cpu                 = 4
   memory              = 4096

@@ -12,7 +12,7 @@ resource "vpsadmin_dataset" "nas-backups" {
 # Create a subdataset in a VPS
 resource "vpsadmin_vps" "my-vps" {
   location = "Praha"
-  install_os_template = "ubuntu-20.04-x86_64-vpsadminos-minimal"
+  install_os_template = "debian-13-x86_64-vpsadminos-minimal"
   cpu = 8
   memory = 4096
   diskspace = 60*1024
