@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"github.com/vpsfreecz/vpsadmin-go-client/client"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 type options struct {
@@ -117,7 +117,7 @@ func getCredentials(opts *options) error {
 	}
 
 	fmt.Print("Password: ")
-	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	fmt.Print("\n")
 
 	if err != nil {

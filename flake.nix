@@ -58,14 +58,14 @@
             pname = "terraform-provider-vpsadmin";
             version = "1.4.0";
             src = providerSource;
-            vendorHash = "sha256-98lrEH7j4Fl0oSEoL75e0h+8ySLacPK2k0OehY3jqhA=";
+            vendorHash = "sha256-fbFpENa1/8Qs6RnTUMi0LDATho8+WuKhj4i8S/dG3Yg=";
             subPackages = [ "." ];
           };
           get-token = pkgs.buildGo126Module {
             pname = "get-token";
             version = "0.1.0";
             src = ./get-token;
-            vendorHash = "sha256-KSCApDutkD45JIINXOrIbyk4uvDS9DifmiYCzeI0i/4=";
+            vendorHash = "sha256-KccGGAwVRuPNsHIWyGE8swqW9cGE+0FOgbkztdu5Fwo=";
           };
         in
         {
