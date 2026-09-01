@@ -56,7 +56,7 @@
           };
           terraform-provider-vpsadmin = pkgs.buildGo126Module {
             pname = "terraform-provider-vpsadmin";
-            version = "1.4.0";
+            version = "1.5.0";
             src = providerSource;
             vendorHash = "sha256-fbFpENa1/8Qs6RnTUMi0LDATho8+WuKhj4i8S/dG3Yg=";
             subPackages = [ "." ];
