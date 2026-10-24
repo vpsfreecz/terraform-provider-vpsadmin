@@ -11,6 +11,7 @@ Update a flake input, verify that only flake.lock changed, and commit the
 result using the repository's flake update commit message format.
 
 Defaults to updating the vpsadmin input.
+Set CONFCTL_FLAKE to the immutable CI package reference in the update workflow.
 EOF
 }
 
@@ -48,12 +49,16 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   exit 1
 fi
 
+: "${CONFCTL_FLAKE:?Set CONFCTL_FLAKE to the pinned confctl CI package}"
+
 old_rev="$(
-  nix flake metadata --json --no-write-lock-file . \
-    | jq -er --arg input "$input" '.locks.nodes[$input].locked.rev'
+  nix shell "$CONFCTL_FLAKE" -c confctl inputs ls --json "$input" | jq -er --arg input "$input" '
+    map(select(.input == $input))
+    | if length == 1 then .[0].rev | select(type == "string" and length > 0) else empty end
+  '
 )"
 
-nix flake update "$input"
+nix shell "$CONFCTL_FLAKE" -c confctl inputs update --forward-only "$input"
 
 if git diff --quiet -- flake.lock; then
   echo "flake input ${input} is already up to date at ${old_rev:0:9}"
@@ -68,8 +73,10 @@ if [ "$changed_files" != "flake.lock" ]; then
 fi
 
 new_rev="$(
-  nix flake metadata --json --no-write-lock-file . \
-    | jq -er --arg input "$input" '.locks.nodes[$input].locked.rev'
+  nix shell "$CONFCTL_FLAKE" -c confctl inputs ls --json "$input" | jq -er --arg input "$input" '
+    map(select(.input == $input))
+    | if length == 1 then .[0].rev | select(type == "string" and length > 0) else empty end
+  '
 )"
 
 git add flake.lock
